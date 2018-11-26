@@ -33,6 +33,7 @@ public class PlacePTUI implements Observer {
             System.err.println("Usage: java PlaceClient host port username");
         }
         boolean loggedIn = false;
+        boolean readyToSend = false;
         Scanner userIn = new Scanner(System.in);
         String userInput;
         int port = Integer.parseInt(args[1]);
@@ -42,22 +43,22 @@ public class PlacePTUI implements Observer {
             String username = args[2];
             out.writeUnshared(new PlaceRequest<>(PlaceRequest.RequestType.LOGIN, username));
             while (true) {
-                PlaceRequest<?> request;
-                if ((request = (PlaceRequest<?>) in.readUnshared()) != null) {
-                    if (request.getType() == PlaceRequest.RequestType.LOGIN_SUCCESS) {
-                        System.out.println("Login Success");
-                        loggedIn = true;
-                        System.out.println("Please enter your change as: row column color");
-                    } else if (request.getType() == PlaceRequest.RequestType.ERROR) {
-                        System.err.println((String) request.getData());
-                    } else if (request.getType() == PlaceRequest.RequestType.BOARD) {
-                        System.out.println("Board received: " + request.getData());
-                    } else if (request.getType() == PlaceRequest.RequestType.TILE_CHANGED) {
-                        System.out.println("Tile Changed: " + request.getData());
-                        //Thread.sleep(500);
-                    }
+                PlaceRequest<?> request= (PlaceRequest<?>) in.readUnshared();
+                if (request.getType() == PlaceRequest.RequestType.LOGIN_SUCCESS) {
+                    System.out.println("Login Success");
+                    loggedIn = true;
+
+                } else if (request.getType() == PlaceRequest.RequestType.ERROR) {
+                    System.err.println((String) request.getData());
+                } else if (request.getType() == PlaceRequest.RequestType.BOARD) {
+                    System.out.println("Board received: " + request.getData());
+                    System.out.println("Please enter your change as: row column color");
+                    readyToSend = true;
+                } else if (request.getType() == PlaceRequest.RequestType.TILE_CHANGED) {
+                    System.out.println("Tile Changed: " + request.getData());
+                    //Thread.sleep(500);
                 }
-                else if(loggedIn){
+                if(readyToSend){
                     int row = userIn.nextInt();
                     int column = userIn.nextInt();
                     int color = userIn.nextInt();
@@ -66,6 +67,7 @@ public class PlacePTUI implements Observer {
                         if(c.getNumber() == color){color1 = c;}
                     }
                     out.writeUnshared(new PlaceRequest<>(PlaceRequest.RequestType.CHANGE_TILE, new PlaceTile(row, column, username, color1)));
+                    readyToSend = false;
                 }
                 //Thread.sleep(10000);
                 //out.writeUnshared(new PlaceRequest<>(PlaceRequest.RequestType.CHANGE_TILE, new PlaceTile(rand.nextInt(10), rand.nextInt(10), username, PlaceColor.BLACK)));

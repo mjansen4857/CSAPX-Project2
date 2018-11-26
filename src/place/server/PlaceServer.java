@@ -87,9 +87,9 @@ public class PlaceServer{
                     System.out.println("Username already exists: " + username);
                     sendMessage(new PlaceRequest(PlaceRequest.RequestType.ERROR, "Username already taken!"));
                 }else{
+                    sendMessage(new PlaceRequest(PlaceRequest.RequestType.LOGIN_SUCCESS, ""));
                     PlaceServer.instance.addClient(username, this);
                     System.out.println("User: " + username + " connected");
-                    sendMessage(new PlaceRequest(PlaceRequest.RequestType.LOGIN_SUCCESS, ""));
                 }
             }else if(request.getType() == PlaceRequest.RequestType.CHANGE_TILE){
                 PlaceTile tile = (PlaceTile) request.getData();
