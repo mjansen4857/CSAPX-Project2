@@ -32,7 +32,7 @@ public class TestClient {
                 }else if(request.getType() == PlaceRequest.RequestType.TILE_CHANGED){
                     System.out.println("Tile Changed: " + request.getData());
                 }
-                Thread.sleep(1000);
+                Thread.sleep(10000);
                 out.writeUnshared(new PlaceRequest<>(PlaceRequest.RequestType.CHANGE_TILE, new PlaceTile(rand.nextInt(10), rand.nextInt(10), username, PlaceColor.BLACK)));
             }
         }catch (Exception e){

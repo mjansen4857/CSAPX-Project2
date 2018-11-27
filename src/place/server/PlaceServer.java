@@ -78,6 +78,7 @@ public class PlaceServer{
 
         public void sendMessage(PlaceRequest request) throws IOException{
             out.writeUnshared(request);
+            out.flush();
         }
 
         public void handleMessage(PlaceRequest request) throws IOException{
