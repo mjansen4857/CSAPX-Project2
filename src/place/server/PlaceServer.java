@@ -58,7 +58,7 @@ public class PlaceServer{
         }
     }
 
-    private class ClientThread implements Runnable{
+    public class ClientThread implements Runnable{
         private Socket socket;
         private ObjectInputStream in;
         private ObjectOutputStream out;
