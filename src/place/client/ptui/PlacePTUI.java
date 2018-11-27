@@ -1,8 +1,6 @@
 package place.client.ptui;
 
-import place.PlaceBoard;
-import place.PlaceColor;
-import place.PlaceTile;
+import place.*;
 import place.network.PlaceRequest;
 import place.server.PlaceServer;
 
@@ -18,8 +16,8 @@ import java.util.Scanner;
 
 public class PlacePTUI extends ConsoleApplication implements Observer {
 
-    private PlaceBoard board;
-    private PlaceServer.ClientThread serverConn;
+    private Board model;
+    private NetworkClient serverConn;
     private Scanner userIn;
     private PrintWriter userOut;
 
@@ -29,9 +27,16 @@ public class PlacePTUI extends ConsoleApplication implements Observer {
             // Get host info from command line
             String host = args.get( 0 );
             int port = Integer.parseInt( args.get( 1 ) );
+            this.model = new Board();
 
             // Create the network connection.
-            //this.serverConn = new PlaceServer.ClientThread(host, port, this.board);
+            try{
+                this.serverConn = new NetworkClient(host, port, this.model);
+            }
+            catch(PlaceException e){
+                System.out.println(e);
+                System.exit(-1);
+            }
     }
 
     @Override
