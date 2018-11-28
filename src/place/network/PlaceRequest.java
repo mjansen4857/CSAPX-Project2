@@ -21,7 +21,7 @@ public class PlaceRequest<E extends Serializable> implements Serializable {
     public enum RequestType {
         /**
          * After a successful client login, the server will send the current
-         * Board to the client.  This is only sent once - afterwards the
+         * ClientModel to the client.  This is only sent once - afterwards the
          * only information transmitted are the tile changes.
          */
         BOARD,

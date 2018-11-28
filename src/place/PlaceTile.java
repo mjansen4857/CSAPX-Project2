@@ -3,7 +3,7 @@ package place;
 import java.io.Serializable;
 
 /**
- * The Board contains a grid of Tile objects at each board coordinate. This is
+ * The ClientModel contains a grid of Tile objects at each board coordinate. This is
  * the primary thing the clients are interested in changing.
  *
  * @author Sean Strout @ RIT CS

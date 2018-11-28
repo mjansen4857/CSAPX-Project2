@@ -35,6 +35,7 @@ public class PlaceServer{
             board.setTile(tile);
             for(ClientThread client:clients.values()){
                 client.sendMessage(new PlaceRequest<>(PlaceRequest.RequestType.TILE_CHANGED, tile));
+                //client.sendMessage(new PlaceRequest<>(PlaceRequest.RequestType.BOARD, board));
             }
         }
     }
@@ -57,7 +58,7 @@ public class PlaceServer{
         }
     }
 
-    private class ClientThread implements Runnable{
+    public class ClientThread implements Runnable{
         private Socket socket;
         private ObjectInputStream in;
         private ObjectOutputStream out;
@@ -77,6 +78,7 @@ public class PlaceServer{
 
         public void sendMessage(PlaceRequest request) throws IOException{
             out.writeUnshared(request);
+            out.flush();
         }
 
         public void handleMessage(PlaceRequest request) throws IOException{
@@ -86,9 +88,9 @@ public class PlaceServer{
                     System.out.println("Username already exists: " + username);
                     sendMessage(new PlaceRequest(PlaceRequest.RequestType.ERROR, "Username already taken!"));
                 }else{
+                    sendMessage(new PlaceRequest(PlaceRequest.RequestType.LOGIN_SUCCESS, ""));
                     PlaceServer.instance.addClient(username, this);
                     System.out.println("User: " + username + " connected");
-                    sendMessage(new PlaceRequest(PlaceRequest.RequestType.LOGIN_SUCCESS, ""));
                 }
             }else if(request.getType() == PlaceRequest.RequestType.CHANGE_TILE){
                 PlaceTile tile = (PlaceTile) request.getData();
