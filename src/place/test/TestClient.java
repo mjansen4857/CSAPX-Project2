@@ -28,7 +28,7 @@ public class TestClient {
                 } else if (request.getType() == PlaceRequest.RequestType.ERROR){
                     System.err.println((String) request.getData());
                 }else if(request.getType() == PlaceRequest.RequestType.BOARD){
-                    System.out.println("Board received: " + request.getData());
+                    System.out.println("ClientModel received: " + request.getData());
                 }else if(request.getType() == PlaceRequest.RequestType.TILE_CHANGED){
                     System.out.println("Tile Changed: " + request.getData());
                 }

@@ -1,34 +1,20 @@
-package place;
+package place.client.model;
 
-import java.io.Serializable;
+import place.PlaceBoard;
+import place.PlaceColor;
+import place.PlaceTile;
 
-/**
- * The board is the place that holds the colored tiles.  The server creates
- * the initial ClientModel and then transmits it only once to each client that
- * successfully logs in to the server.
- *
- * @author Sean Strout @ RIT CS
- */
-public class PlaceBoard implements Serializable {
-    /** The square dimension of the board */
-    public final int DIM;
-    /** The grid of tiles */
+import java.util.Observable;
+
+public class ClientModel extends Observable {
+
+    private int DIM;
     private PlaceTile[][] board;
 
     /**
      * Create a new board of all white tiles.
-     *
-     * @param DIM the square dimension of the board
      */
-    public PlaceBoard(int DIM) {
-        this.DIM = DIM;
-        this.board = new PlaceTile[DIM][DIM];
-        for (int row=0; row<DIM; ++row) {
-            for (int col=0; col<DIM; ++col) {
-                this.board[row][col] =
-                        new PlaceTile(row, col, "", PlaceColor.WHITE);
-            }
-        }
+    public ClientModel() {
     }
 
     /**
@@ -62,16 +48,17 @@ public class PlaceBoard implements Serializable {
         this.board[tile.getRow()][tile.getCol()] = tile;
     }
 
-    /**
-     * Tells whether the coordinates of the tile are valid or not
-     * @param tile the tile
-     * @return are the coordinates within the dimensions of the board?
-     */
-    public boolean isValid(PlaceTile tile) {
-        return tile.getRow() >=0 &&
-                tile.getRow() < this.DIM &&
-                tile.getCol() >= 0 &&
-                tile.getCol() < this.DIM;
+    public void allocate(int DIM){
+        this.DIM = DIM;
+        board = new PlaceTile[DIM][DIM];
+    }
+
+    public void initBoard(PlaceBoard game){
+        for(int row=0; row < game.getBoard().length; row++){
+            for(int col=0; row < game.getBoard()[row].length; col++){
+                board[row][col] = game.getBoard()[row][col];
+            }
+        }
     }
 
     /**

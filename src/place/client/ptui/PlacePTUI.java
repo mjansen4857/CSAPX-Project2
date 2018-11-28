@@ -1,14 +1,10 @@
 package place.client.ptui;
 
 import place.*;
-import place.network.PlaceRequest;
-import place.server.PlaceServer;
+import place.client.model.ClientModel;
+import place.client.network.NetworkClient;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
-import java.net.Socket;
 import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
@@ -16,7 +12,7 @@ import java.util.Scanner;
 
 public class PlacePTUI extends ConsoleApplication implements Observer {
 
-    private Board model;
+    private ClientModel model;
     private NetworkClient serverConn;
     private Scanner userIn;
     private PrintWriter userOut;
@@ -27,7 +23,7 @@ public class PlacePTUI extends ConsoleApplication implements Observer {
             // Get host info from command line
             String host = args.get( 0 );
             int port = Integer.parseInt( args.get( 1 ) );
-            this.model = new Board();
+            this.model = new ClientModel();
 
             // Create the network connection.
             try{
@@ -54,7 +50,7 @@ public class PlacePTUI extends ConsoleApplication implements Observer {
 
     @Override
     public void update( Observable t, Object o ) {
-
+        System.out.println(model.toString());
     }
 
     public static void main(String[] args) {

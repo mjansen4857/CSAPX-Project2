@@ -1,4 +1,8 @@
-package place;
+package place.client.network;
+
+import place.PlaceException;
+import place.client.model.ClientModel;
+import place.network.PlaceRequest;
 
 import java.io.IOException;
 import java.io.PrintStream;
@@ -52,9 +56,9 @@ public class NetworkClient {
     private PrintStream networkOut;
 
     /**
-     * The {@link Board} used to keep track of the state of the game.
+     * The {@link ClientModel} used to keep track of the state of the game.
      */
-    private Board game;
+    private ClientModel game;
 
     /**
      * Sentinel used to control the main game loop.
@@ -92,7 +96,7 @@ public class NetworkClient {
      *                 must be updated upon receiving server messages
      * @throws PlaceException If there is a problem opening the connection
      */
-    public NetworkClient( String hostname, int port, Board model )
+    public NetworkClient( String hostname, int port, ClientModel model )
             throws PlaceException {
         try {
             this.sock = new Socket( hostname, port );
@@ -104,7 +108,7 @@ public class NetworkClient {
             // Block waiting for the CONNECT message from the server.
             String request = this.networkIn.next();
             String arguments = this.networkIn.nextLine();
-            assert request.equals( ReversiProtocol.CONNECT ) :
+            assert request.equals(PlaceRequest.RequestType.LOGIN) :
                     "CONNECT not 1st";
             NetworkClient.dPrint( "Connected to server " + this.sock );
             this.connect( arguments );
@@ -140,75 +144,15 @@ public class NetworkClient {
     }
 
     /**
-     * Tell the local user to choose a move. How this is communicated to
-     * the user is up to the View (UI).
-     */
-    private void makeMove() {
-        this.game.makeMove();
-    }
-
-    /**
-     * A move has been made by one of the players
-     *
-     * @param arguments string from the server's message that
-     *                  contains the row, then column where the
-     *                  player made the move
-     */
-    public void moveMade( String arguments ) {
-        NetworkClient.dPrint( '!' + ',' + arguments );
-
-        String[] fields = arguments.trim().split( " " );
-        int row = Integer.parseInt( fields[ 0 ] );
-        int column = Integer.parseInt( fields[ 1 ] );
-
-        // Update the board model.
-        this.game.moveMade( row, column );
-    }
-
-    /**
-     * Called when the server sends a message saying that the
-     * game has been won by this player. Ends the game.
-     */
-    public void gameWon() {
-        NetworkClient.dPrint( '!' + GAME_WON );
-
-        dPrint( "You won! Yay!" );
-        this.game.gameWon();
-        this.stop();
-    }
-
-    /**
-     * Called when the server sends a message saying that the
-     * game has been won by the other player. Ends the game.
-     */
-    public void gameLost() {
-        NetworkClient.dPrint( '!' + GAME_LOST );
-        dPrint( "You lost! Boo!" );
-        this.game.gameLost();
-        this.stop();
-    }
-
-    /**
-     * Called when the server sends a message saying that the
-     * game is a tie. Ends the game.
-     */
-    public void gameTied() {
-        NetworkClient.dPrint( '!' + GAME_TIED );
-        dPrint( "You tied! Meh!" );
-        this.game.gameTied();
-        this.stop();
-    }
-
-    /**
      * Called when the server sends a message saying that
      * gameplay is damaged. Ends the game.
      *
      * @param arguments The error message sent from the reversi.server.
      */
     public void error( String arguments ) {
-        NetworkClient.dPrint( '!' + ERROR + ',' + arguments );
+        NetworkClient.dPrint( '!' + PlaceRequest.RequestType.ERROR.toString() + ',' + arguments );
         dPrint( "Fatal error: " + arguments );
-        this.game.error( arguments );
+        //this.game.error( arguments );
         this.stop();
     }
 
@@ -223,17 +167,7 @@ public class NetworkClient {
         catch( IOException ioe ) {
             // squash
         }
-        this.game.close();
-    }
-
-    /**
-     * UI wants to send a new move to the server.
-     *
-     * @param row the row
-     * @param col the column
-     */
-    public void sendMove( int row, int col ) {
-        this.networkOut.println( MOVE + " " + row + " " + col );
+        //this.game.close();
     }
 
     /**
