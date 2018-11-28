@@ -1,5 +1,6 @@
 package place.test;
 
+import place.PlaceBoard;
 import place.PlaceColor;
 import place.PlaceTile;
 import place.network.PlaceRequest;
@@ -21,6 +22,7 @@ public class TestClient {
             Random rand = new Random();
             String username = "user" + rand.nextInt(10);
             out.writeUnshared(new PlaceRequest<>(PlaceRequest.RequestType.LOGIN, username));
+            PlaceBoard board = null;
             while (true) {
                 PlaceRequest<?> request = (PlaceRequest<?>) in.readUnshared();
                 if (request.getType() == PlaceRequest.RequestType.LOGIN_SUCCESS) {
@@ -28,11 +30,14 @@ public class TestClient {
                 } else if (request.getType() == PlaceRequest.RequestType.ERROR){
                     System.err.println((String) request.getData());
                 }else if(request.getType() == PlaceRequest.RequestType.BOARD){
+                    board = (PlaceBoard) request.getData();
                     System.out.println("Board received: " + request.getData());
                 }else if(request.getType() == PlaceRequest.RequestType.TILE_CHANGED){
+                    board.setTile((PlaceTile) request.getData());
+                    System.out.println(board);
                     System.out.println("Tile Changed: " + request.getData());
                 }
-                Thread.sleep(10000);
+                Thread.sleep(1000);
                 out.writeUnshared(new PlaceRequest<>(PlaceRequest.RequestType.CHANGE_TILE, new PlaceTile(rand.nextInt(10), rand.nextInt(10), username, PlaceColor.BLACK)));
             }
         }catch (Exception e){
