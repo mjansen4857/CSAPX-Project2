@@ -100,27 +100,32 @@ public class NetworkClient {
      */
     public NetworkClient( String hostname, int port, String username, ClientModel model )
             throws PlaceException {
+
         try {
+            System.out.println("TEST1");
             this.sock = new Socket( hostname, port );
+            System.out.println("TEST2");
             this.networkIn = new ObjectInputStream( sock.getInputStream() );
+            System.out.println("TEST3");
             this.networkOut = new ObjectOutputStream( sock.getOutputStream() );
+            System.out.println("TEST4");
             this.game = model;
+            System.out.println("TEST5");
             this.go = true;
+            System.out.println("TEST6");
 
             this.networkOut.writeUnshared(new PlaceRequest<>(PlaceRequest.RequestType.LOGIN, username));
+            this.networkOut.flush();
             // Block waiting for the CONNECT message from the server.
             PlaceRequest<?> request = (PlaceRequest<?>) this.networkIn.readUnshared();
 
             if (request.getType() == PlaceRequest.RequestType.LOGIN_SUCCESS){
-                
+                System.out.println("Login success");
             }
             else if (request.getType() == PlaceRequest.RequestType.ERROR){
                 System.err.println((String) request.getData());
+                System.exit(-1);
             }
-            assert request.equals(PlaceRequest.RequestType.LOGIN) :
-                    "CONNECT not 1st";
-            NetworkClient.dPrint( "Connected to server " + this.sock );
-
 
             // Run rest of client in separate thread.
             // This threads stops on its own at the end of the game and
@@ -193,8 +198,7 @@ public class NetworkClient {
         while ( this.goodToGo() ) {
             try {
 
-                String request = this.networkIn.next();
-                String arguments = this.networkIn.nextLine().trim();
+                PlaceRequest<?> request = (PlaceRequest<?>) this.networkIn.readUnshared();
                 NetworkClient.dPrint( "Net message in = \"" + request + '"' );
 
             }

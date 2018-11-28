@@ -41,6 +41,7 @@ public class PlaceServer{
     }
 
     public void addClient(String username, ClientThread thread) throws IOException{
+        System.out.println("CONNECTING");
         clients.put(username, thread);
         thread.sendMessage(new PlaceRequest<>(PlaceRequest.RequestType.BOARD, board));
     }
@@ -67,8 +68,8 @@ public class PlaceServer{
         public ClientThread(Socket socket){
             this.socket = socket;
             try {
-                this.in = new ObjectInputStream(socket.getInputStream());
-                this.out = new ObjectOutputStream(socket.getOutputStream());
+                this.in = new ObjectInputStream(this.socket.getInputStream());
+                this.out = new ObjectOutputStream(this.socket.getOutputStream());
 
             }catch (IOException e){
                 e.printStackTrace();

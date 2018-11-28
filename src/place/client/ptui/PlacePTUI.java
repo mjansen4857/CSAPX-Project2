@@ -19,12 +19,14 @@ public class PlacePTUI extends ConsoleApplication implements Observer {
     private PrintWriter userOut;
 
     public void init() {
+
             List< String > args = super.getArguments();
 
             // Get host info from command line
             String host = args.get( 0 );
             int port = Integer.parseInt( args.get( 1 ) );
             String username = args.get(2);
+
             this.model = new ClientModel();
 
             // Create the network connection.
@@ -61,29 +63,5 @@ public class PlacePTUI extends ConsoleApplication implements Observer {
             System.exit(0);
         }
         ConsoleApplication.launch(PlacePTUI.class, args);
-        int port = Integer.parseInt(args[1]);
-        try(Socket socket = new Socket(args[0], port);
-            ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
-            ObjectInputStream in = new ObjectInputStream(socket.getInputStream())) {
-            Random rand = new Random();
-            String username = "user" + rand.nextInt(10);
-            out.writeUnshared(new PlaceRequest<>(PlaceRequest.RequestType.LOGIN, username));
-            while (true) {
-                PlaceRequest<?> request = (PlaceRequest<?>) in.readUnshared();
-                if (request.getType() == PlaceRequest.RequestType.LOGIN_SUCCESS) {
-                    System.out.println("Login Success");
-                } else if (request.getType() == PlaceRequest.RequestType.ERROR){
-                    System.err.println((String) request.getData());
-                }else if(request.getType() == PlaceRequest.RequestType.BOARD){
-                    System.out.println("ClientModel received: " + request.getData());
-                }else if(request.getType() == PlaceRequest.RequestType.TILE_CHANGED){
-                    System.out.println("Tile Changed: " + request.getData());
-                }
-                Thread.sleep(1000);
-                out.writeUnshared(new PlaceRequest<>(PlaceRequest.RequestType.CHANGE_TILE, new PlaceTile(rand.nextInt(10), rand.nextInt(10), username, PlaceColor.BLACK)));
-            }
-        }catch (Exception e){
-            e.printStackTrace();
-        }
     }
 }
