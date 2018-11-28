@@ -35,6 +35,7 @@ public class PlaceServer{
             board.setTile(tile);
             for(ClientThread client:clients.values()){
                 client.sendMessage(new PlaceRequest<>(PlaceRequest.RequestType.TILE_CHANGED, tile));
+                //client.sendMessage(new PlaceRequest<>(PlaceRequest.RequestType.BOARD, board));
             }
         }
     }

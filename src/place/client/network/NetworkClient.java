@@ -5,6 +5,8 @@ import place.client.model.ClientModel;
 import place.network.PlaceRequest;
 
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.PrintStream;
 import java.net.Socket;
 import java.util.NoSuchElementException;
@@ -48,12 +50,12 @@ public class NetworkClient {
     /**
      * The {@link Scanner} used to read requests from the reversi server.
      */
-    private Scanner networkIn;
+    private ObjectInputStream networkIn;
 
     /**
      * The {@link PrintStream} used to write responses to the reversi server.
      */
-    private PrintStream networkOut;
+    private ObjectOutputStream networkOut;
 
     /**
      * The {@link ClientModel} used to keep track of the state of the game.
@@ -96,22 +98,29 @@ public class NetworkClient {
      *                 must be updated upon receiving server messages
      * @throws PlaceException If there is a problem opening the connection
      */
-    public NetworkClient( String hostname, int port, ClientModel model )
+    public NetworkClient( String hostname, int port, String username, ClientModel model )
             throws PlaceException {
         try {
             this.sock = new Socket( hostname, port );
-            this.networkIn = new Scanner( sock.getInputStream() );
-            this.networkOut = new PrintStream( sock.getOutputStream() );
+            this.networkIn = new ObjectInputStream( sock.getInputStream() );
+            this.networkOut = new ObjectOutputStream( sock.getOutputStream() );
             this.game = model;
             this.go = true;
 
+            this.networkOut.writeUnshared(new PlaceRequest<>(PlaceRequest.RequestType.LOGIN, username));
             // Block waiting for the CONNECT message from the server.
-            String request = this.networkIn.next();
-            String arguments = this.networkIn.nextLine();
+            PlaceRequest<?> request = (PlaceRequest<?>) this.networkIn.readUnshared();
+
+            if (request.getType() == PlaceRequest.RequestType.LOGIN_SUCCESS){
+                
+            }
+            else if (request.getType() == PlaceRequest.RequestType.ERROR){
+                System.err.println((String) request.getData());
+            }
             assert request.equals(PlaceRequest.RequestType.LOGIN) :
                     "CONNECT not 1st";
             NetworkClient.dPrint( "Connected to server " + this.sock );
-            this.connect( arguments );
+
 
             // Run rest of client in separate thread.
             // This threads stops on its own at the end of the game and
@@ -121,6 +130,10 @@ public class NetworkClient {
         }
         catch( IOException e ) {
             throw new PlaceException( e );
+        }
+        catch( ClassNotFoundException e ){
+            System.err.println(e);
+            System.exit(-1);
         }
     }
 
@@ -179,6 +192,7 @@ public class NetworkClient {
 
         while ( this.goodToGo() ) {
             try {
+
                 String request = this.networkIn.next();
                 String arguments = this.networkIn.nextLine().trim();
                 NetworkClient.dPrint( "Net message in = \"" + request + '"' );

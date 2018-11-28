@@ -3,12 +3,13 @@ package place.client.ptui;
 import place.*;
 import place.client.model.ClientModel;
 import place.client.network.NetworkClient;
+import place.network.PlaceRequest;
 
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
-import java.util.List;
-import java.util.Observable;
-import java.util.Observer;
-import java.util.Scanner;
+import java.net.Socket;
+import java.util.*;
 
 public class PlacePTUI extends ConsoleApplication implements Observer {
 
@@ -23,11 +24,12 @@ public class PlacePTUI extends ConsoleApplication implements Observer {
             // Get host info from command line
             String host = args.get( 0 );
             int port = Integer.parseInt( args.get( 1 ) );
+            String username = args.get(2);
             this.model = new ClientModel();
 
             // Create the network connection.
             try{
-                this.serverConn = new NetworkClient(host, port, this.model);
+                this.serverConn = new NetworkClient(host, port, username, this.model);
             }
             catch(PlaceException e){
                 System.out.println(e);
@@ -45,7 +47,7 @@ public class PlacePTUI extends ConsoleApplication implements Observer {
     public void stop() {
         this.userIn.close();
         this.userOut.close();
-        //this.serverConn.close();
+        this.serverConn.close();
     }
 
     @Override
@@ -59,5 +61,29 @@ public class PlacePTUI extends ConsoleApplication implements Observer {
             System.exit(0);
         }
         ConsoleApplication.launch(PlacePTUI.class, args);
+        int port = Integer.parseInt(args[1]);
+        try(Socket socket = new Socket(args[0], port);
+            ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
+            ObjectInputStream in = new ObjectInputStream(socket.getInputStream())) {
+            Random rand = new Random();
+            String username = "user" + rand.nextInt(10);
+            out.writeUnshared(new PlaceRequest<>(PlaceRequest.RequestType.LOGIN, username));
+            while (true) {
+                PlaceRequest<?> request = (PlaceRequest<?>) in.readUnshared();
+                if (request.getType() == PlaceRequest.RequestType.LOGIN_SUCCESS) {
+                    System.out.println("Login Success");
+                } else if (request.getType() == PlaceRequest.RequestType.ERROR){
+                    System.err.println((String) request.getData());
+                }else if(request.getType() == PlaceRequest.RequestType.BOARD){
+                    System.out.println("ClientModel received: " + request.getData());
+                }else if(request.getType() == PlaceRequest.RequestType.TILE_CHANGED){
+                    System.out.println("Tile Changed: " + request.getData());
+                }
+                Thread.sleep(1000);
+                out.writeUnshared(new PlaceRequest<>(PlaceRequest.RequestType.CHANGE_TILE, new PlaceTile(rand.nextInt(10), rand.nextInt(10), username, PlaceColor.BLACK)));
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 }
