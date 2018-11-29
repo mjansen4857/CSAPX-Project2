@@ -41,7 +41,6 @@ public class PlaceServer{
     }
 
     public void addClient(String username, ClientThread thread) throws IOException{
-        System.out.println("CONNECTING");
         clients.put(username, thread);
         thread.sendMessage(new PlaceRequest<>(PlaceRequest.RequestType.BOARD, board));
     }

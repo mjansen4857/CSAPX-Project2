@@ -1,6 +1,9 @@
 package place.client.network;
 
+import place.PlaceBoard;
+import place.PlaceColor;
 import place.PlaceException;
+import place.PlaceTile;
 import place.client.model.ClientModel;
 import place.network.PlaceRequest;
 
@@ -67,6 +70,10 @@ public class NetworkClient {
      */
     private boolean go;
 
+    private boolean ready = false;
+
+    private String username;
+
     /**
      * Accessor that takes multithreaded access into account
      *
@@ -102,63 +109,32 @@ public class NetworkClient {
             throws PlaceException {
 
         try {
-            System.out.println("TEST1");
             this.sock = new Socket( hostname, port );
-            System.out.println("TEST2");
-            this.networkIn = new ObjectInputStream( sock.getInputStream() );
-            System.out.println("TEST3");
             this.networkOut = new ObjectOutputStream( sock.getOutputStream() );
-            System.out.println("TEST4");
+            //this.networkOut.flush();
+            this.networkIn = new ObjectInputStream( sock.getInputStream() );
             this.game = model;
-            System.out.println("TEST5");
+            this.username = username;
             this.go = true;
-            System.out.println("TEST6");
 
-            this.networkOut.writeUnshared(new PlaceRequest<>(PlaceRequest.RequestType.LOGIN, username));
-            this.networkOut.flush();
+            //this.networkOut.writeUnshared(new PlaceRequest<>(PlaceRequest.RequestType.LOGIN, username));
+            //this.networkOut.flush();
+
             // Block waiting for the CONNECT message from the server.
-            PlaceRequest<?> request = (PlaceRequest<?>) this.networkIn.readUnshared();
 
-            if (request.getType() == PlaceRequest.RequestType.LOGIN_SUCCESS){
-                System.out.println("Login success");
-            }
-            else if (request.getType() == PlaceRequest.RequestType.ERROR){
-                System.err.println((String) request.getData());
-                System.exit(-1);
-            }
 
             // Run rest of client in separate thread.
             // This threads stops on its own at the end of the game and
             // does not need to rendez-vous with other software components.
             Thread netThread = new Thread( () -> this.run() );
             netThread.start();
+            Thread userInThread = new Thread( () -> this.run2() );
+            userInThread.start();
         }
         catch( IOException e ) {
             throw new PlaceException( e );
         }
-        catch( ClassNotFoundException e ){
-            System.err.println(e);
-            System.exit(-1);
-        }
-    }
 
-
-    /**
-     * Called by the constructor to set up the game board for this player now
-     * that the server has sent the board dimensions with the
-     *
-     *
-     * @param arguments string from the server's message that
-     *                  contains the square dimension of the board
-     * @throws PlaceException if the dimensions be small
-     */
-    public void connect( String arguments ) throws PlaceException {
-        // Get numbers from string
-        String fields[] = arguments.trim().split( " " );
-        int DIM = Integer.parseInt( fields[ 0 ] );
-
-        // Get the board state set up.
-        this.game.allocate( DIM ); // may throw exception
     }
 
     /**
@@ -195,13 +171,32 @@ public class NetworkClient {
      */
     private void run() {
 
+        try {
+            this.networkOut.writeUnshared(new PlaceRequest<>(PlaceRequest.RequestType.LOGIN, this.username));
+        }
+        catch (IOException e){
+            System.err.println(e);
+            System.exit(-1);
+        }
+
         while ( this.goodToGo() ) {
             try {
-
-                PlaceRequest<?> request = (PlaceRequest<?>) this.networkIn.readUnshared();
-                NetworkClient.dPrint( "Net message in = \"" + request + '"' );
-
+                PlaceRequest<?> request = (PlaceRequest<?>) networkIn.readUnshared();
+                if (request.getType() == PlaceRequest.RequestType.LOGIN_SUCCESS) {
+                    System.out.println("Login Success");
+                } else if (request.getType() == PlaceRequest.RequestType.ERROR){
+                    System.err.println((String) request.getData());
+                }else if(request.getType() == PlaceRequest.RequestType.BOARD){
+                    game.initBoard((PlaceBoard) request.getData());
+                    System.out.println("Board received: " + request.getData());
+                    ready = true;
+                }else if(request.getType() == PlaceRequest.RequestType.TILE_CHANGED){
+                    game.setTile((PlaceTile) request.getData());
+                    System.out.println("\nTile Changed: " + request.getData());
+                    System.out.println(game.toString());
+                }
             }
+
             catch( NoSuchElementException nse ) {
                 // Looks like the connection shut down.
                 this.error( "Lost connection to server." );
@@ -213,6 +208,36 @@ public class NetworkClient {
             }
         }
         this.close();
+    }
+
+    private void run2() {
+
+        try {
+            Scanner in = new Scanner(System.in);
+
+            while (true) {
+                try{
+                    Thread.sleep(500);
+                }
+                catch (InterruptedException e){}
+                System.out.println("Send move as: row col color");
+                int row = in.nextInt();
+                int col = in.nextInt();
+                int colorNum = in.nextInt();
+                PlaceColor color = PlaceColor.BLACK;
+                for(PlaceColor c: PlaceColor.values()){
+                    if(c.getNumber() == colorNum){
+                        color = c;
+                        break;
+                    }
+                }
+                networkOut.writeUnshared(new PlaceRequest<>(PlaceRequest.RequestType.CHANGE_TILE, new PlaceTile(row, col, username, color)));
+            }
+        }
+        catch (IOException e){
+            System.err.println(e);
+            System.exit(-1);
+        }
     }
 
 }

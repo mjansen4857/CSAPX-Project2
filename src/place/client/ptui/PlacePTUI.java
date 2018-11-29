@@ -43,6 +43,15 @@ public class PlacePTUI extends ConsoleApplication implements Observer {
     public synchronized void go(Scanner userIn, PrintWriter userOut) {
         this.userIn = userIn;
         this.userOut = userOut;
+
+        this.model.addObserver( this );
+
+        while(true){
+            try {
+                this.wait();
+            }
+            catch( InterruptedException ie ) {}
+        }
     }
 
     @Override
@@ -54,6 +63,10 @@ public class PlacePTUI extends ConsoleApplication implements Observer {
 
     @Override
     public void update( Observable t, Object o ) {
+
+        assert t == this.model: "Update from non-model Observable";
+
+        System.out.println("Board Updated");
         System.out.println(model.toString());
     }
 
