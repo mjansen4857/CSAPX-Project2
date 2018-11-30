@@ -29,9 +29,12 @@ public class PlacePTUI extends ConsoleApplication implements Observer {
 
             this.model = new ClientModel();
 
+
+
             // Create the network connection.
             try{
                 this.serverConn = new NetworkClient(host, port, username, this.model);
+                this.serverConn.game.addObserver( this );
             }
             catch(PlaceException e){
                 System.out.println(e);
@@ -43,8 +46,6 @@ public class PlacePTUI extends ConsoleApplication implements Observer {
     public synchronized void go(Scanner userIn, PrintWriter userOut) {
         this.userIn = userIn;
         this.userOut = userOut;
-
-        this.serverConn.game.addObserver( this );
 
         while(true){
             try {
@@ -66,7 +67,6 @@ public class PlacePTUI extends ConsoleApplication implements Observer {
 
         assert t == this.model: "Update from non-model Observable";
 
-        System.out.println("Board Updated\n");
         System.out.println(serverConn.game.toString()+"\n");
     }
 

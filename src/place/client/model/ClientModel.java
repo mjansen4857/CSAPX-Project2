@@ -45,6 +45,7 @@ public class ClientModel extends Observable {
      */
     public void setTile(PlaceTile tile) {
         this.board.setTile(tile);
+        super.setChanged();
         super.notifyObservers();
     }
 

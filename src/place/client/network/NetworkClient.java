@@ -165,9 +165,8 @@ public class NetworkClient {
                 game.initBoard((PlaceBoard) request.getData());
                 System.out.println("Board received: " + request.getData());
             } else if (request.getType() == PlaceRequest.RequestType.TILE_CHANGED) {
-                game.setTile((PlaceTile) request.getData());
                 System.out.println("\nTile Changed: " + request.getData());
-                System.out.println(game.toString());
+                game.setTile((PlaceTile) request.getData());
             }
         } catch (NoSuchElementException nse) {
             // Looks like the connection shut down.
