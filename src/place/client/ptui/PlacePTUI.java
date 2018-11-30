@@ -49,7 +49,7 @@ public class PlacePTUI extends ConsoleApplication implements Observer {
         this.userIn = userIn;
         this.userOut = userOut;
 
-        while(true){
+        while(this.serverConn.game.isRunning()){
             try {
                 this.wait();
             }
@@ -80,28 +80,39 @@ public class PlacePTUI extends ConsoleApplication implements Observer {
 
     private void run() {
         Scanner in = new Scanner(System.in);
-        while (true) {
+        int row;
+        int col;
+        PlaceColor color;
+        while (this.serverConn.game.isRunning()) {
+
+            System.out.println("Send move as: row col color");
+            row = in.nextInt();
+            if(row != -1) {
+                col = in.nextInt();
+                int colorNum = in.nextInt();
+                color = PlaceColor.BLACK;
+                //Get the right color, Black by default
+                for (PlaceColor c : PlaceColor.values()) {
+                    if (c.getNumber() == colorNum) {
+                        color = c;
+                        break;
+                    }
+                }
+            }
+            else{
+                col = 0;
+                color = PlaceColor.BLACK;
+            }
+            serverConn.sendMove(row, col, color);
 
             try{
                 //Sleeps half a second after tiles are changed by the client
                 Thread.sleep(500);
             }
             catch (InterruptedException e){}
-
-            System.out.println("Send move as: row col color");
-            int row = in.nextInt();
-            int col = in.nextInt();
-            int colorNum = in.nextInt();
-            PlaceColor color = PlaceColor.BLACK;
-            //Get the right color, Black by default
-            for(PlaceColor c: PlaceColor.values()){
-                if(c.getNumber() == colorNum){
-                    color = c;
-                    break;
-                }
-            }
-            serverConn.sendMove(row, col, color);
         }
+        System.out.println("Disconnected");
+        System.exit(0);
     }
 
     public static void main(String[] args) {

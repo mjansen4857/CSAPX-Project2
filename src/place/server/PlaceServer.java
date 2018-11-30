@@ -4,6 +4,7 @@ import place.PlaceBoard;
 import place.PlaceTile;
 import place.network.PlaceRequest;
 
+import java.io.EOFException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -117,9 +118,14 @@ public class PlaceServer{
                     handleMessage(request);
                     Thread.sleep(10);
                 }
-            }catch (Exception e){
+            }
+            catch (EOFException e){}
+
+            catch (Exception e){
                 e.printStackTrace();
-            }finally {
+            }
+            finally {
+                System.out.println("User: " + username + " disconnected");
                 clients.remove(username);
                 closeAll();
             }

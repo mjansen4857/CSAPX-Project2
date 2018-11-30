@@ -126,8 +126,12 @@ public class NetworkClient {
 
     public void sendMove(int row, int col, PlaceColor color) {
         try {
-
-            networkOut.writeUnshared(new PlaceRequest<>(PlaceRequest.RequestType.CHANGE_TILE, new PlaceTile(row, col, username, color)));
+            if (row != -1) {
+                networkOut.writeUnshared(new PlaceRequest<>(PlaceRequest.RequestType.CHANGE_TILE, new PlaceTile(row, col, username, color)));
+            }
+            else{
+                this.close();
+            }
         }
         catch (IOException e){}
     }
@@ -138,12 +142,16 @@ public class NetworkClient {
      */
     public void close() {
         try {
+
+            this.go = false;
+            this.networkIn.close();
+            this.networkOut.close();
             this.sock.close();
         }
         catch( IOException ioe ) {
             // squash
         }
-        //this.game.close();
+        this.game.close();
     }
 
     /**

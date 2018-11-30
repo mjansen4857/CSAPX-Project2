@@ -10,6 +10,8 @@ public class ClientModel extends Observable {
 
     private PlaceBoard board;
 
+    private boolean running = true;
+
     /**
      * Create a new board of all white tiles.
      */
@@ -53,6 +55,14 @@ public class ClientModel extends Observable {
         board = game;
         super.setChanged();
         super.notifyObservers();
+    }
+
+    public boolean isRunning(){
+        return this.running;
+    }
+
+    public void close(){
+        this.running = false;
     }
 
     /**
