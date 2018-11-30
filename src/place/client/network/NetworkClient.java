@@ -117,14 +117,20 @@ public class NetworkClient {
             // does not need to rendez-vous with other software components.
             Thread netThread = new Thread( () -> this.run() );
             netThread.start();
-            Thread userInThread = new Thread( () -> this.run2() );
-            userInThread.start();
+
         }
         catch( IOException e ) {
             throw new PlaceException( e );
         }
     }
 
+    public void sendMove(int row, int col, PlaceColor color) {
+        try {
+
+            networkOut.writeUnshared(new PlaceRequest<>(PlaceRequest.RequestType.CHANGE_TILE, new PlaceTile(row, col, username, color)));
+        }
+        catch (IOException e){}
+    }
 
     /**
      * This method should be called at the end of the game to
@@ -163,7 +169,7 @@ public class NetworkClient {
                 System.err.println((String) request.getData());
             } else if (request.getType() == PlaceRequest.RequestType.BOARD) {
                 game.initBoard((PlaceBoard) request.getData());
-                System.out.println("Board received: " + request.getData());
+                System.out.println("Board received:");
             } else if (request.getType() == PlaceRequest.RequestType.TILE_CHANGED) {
                 System.out.println("\nTile Changed: " + request.getData());
                 game.setTile((PlaceTile) request.getData());
@@ -175,38 +181,6 @@ public class NetworkClient {
             this.stop();
         }
         this.close();
-    }
-
-    private void run2() {
-        try {
-            Scanner in = new Scanner(System.in);
-            while (true) {
-
-                try{
-                    //Sleeps half a second after tiles are changed by the client
-                    Thread.sleep(500);
-                }
-                catch (InterruptedException e){}
-
-                System.out.println("Send move as: row col color");
-                int row = in.nextInt();
-                int col = in.nextInt();
-                int colorNum = in.nextInt();
-                PlaceColor color = PlaceColor.BLACK;
-                //Get the right color, Black by default
-                for(PlaceColor c: PlaceColor.values()){
-                    if(c.getNumber() == colorNum){
-                        color = c;
-                        break;
-                    }
-                }
-                networkOut.writeUnshared(new PlaceRequest<>(PlaceRequest.RequestType.CHANGE_TILE, new PlaceTile(row, col, username, color)));
-            }
-        }
-        catch (IOException e){
-            System.err.println(e);
-            System.exit(-1);
-        }
     }
 
 }

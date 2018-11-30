@@ -51,6 +51,8 @@ public class ClientModel extends Observable {
 
     public void initBoard(PlaceBoard game){
         board = game;
+        super.setChanged();
+        super.notifyObservers();
     }
 
     /**

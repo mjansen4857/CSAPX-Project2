@@ -5,6 +5,7 @@ import place.client.model.ClientModel;
 import place.client.network.NetworkClient;
 import place.network.PlaceRequest;
 
+import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
@@ -17,6 +18,7 @@ public class PlacePTUI extends ConsoleApplication implements Observer {
     private NetworkClient serverConn;
     private Scanner userIn;
     private PrintWriter userOut;
+    private boolean firstUpdate = true;
 
     public void init() {
 
@@ -68,6 +70,38 @@ public class PlacePTUI extends ConsoleApplication implements Observer {
         assert t == this.model: "Update from non-model Observable";
 
         System.out.println(serverConn.game.toString()+"\n");
+
+        if(firstUpdate){
+            firstUpdate = false;
+            Thread userIn = new Thread( () -> this.run() );
+            userIn.start();
+        }
+    }
+
+    private void run() {
+        Scanner in = new Scanner(System.in);
+        while (true) {
+
+            try{
+                //Sleeps half a second after tiles are changed by the client
+                Thread.sleep(500);
+            }
+            catch (InterruptedException e){}
+
+            System.out.println("Send move as: row col color");
+            int row = in.nextInt();
+            int col = in.nextInt();
+            int colorNum = in.nextInt();
+            PlaceColor color = PlaceColor.BLACK;
+            //Get the right color, Black by default
+            for(PlaceColor c: PlaceColor.values()){
+                if(c.getNumber() == colorNum){
+                    color = c;
+                    break;
+                }
+            }
+            serverConn.sendMove(row, col, color);
+        }
     }
 
     public static void main(String[] args) {
