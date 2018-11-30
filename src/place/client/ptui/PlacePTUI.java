@@ -44,7 +44,7 @@ public class PlacePTUI extends ConsoleApplication implements Observer {
         this.userIn = userIn;
         this.userOut = userOut;
 
-        this.model.addObserver( this );
+        this.serverConn.game.addObserver( this );
 
         while(true){
             try {
@@ -66,8 +66,8 @@ public class PlacePTUI extends ConsoleApplication implements Observer {
 
         assert t == this.model: "Update from non-model Observable";
 
-        System.out.println("Board Updated");
-        System.out.println(model.toString());
+        System.out.println("Board Updated\n");
+        System.out.println(serverConn.game.toString()+"\n");
     }
 
     public static void main(String[] args) {

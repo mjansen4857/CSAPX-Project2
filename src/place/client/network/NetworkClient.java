@@ -17,8 +17,8 @@ import java.util.Scanner;
 
 
 /**
- * The client side network interface to a Reversi game server.
- * Each of the two players in a game gets its own connection to the server.
+ * The client side network interface to a Place server.
+ * Each client gets its own connection to the server.
  * This class represents the controller part of a model-view-controller
  * triumvirate, in that part of its purpose is to forward user actions
  * to the remote server.
@@ -26,6 +26,7 @@ import java.util.Scanner;
  * @author Robert St Jacques @ RIT SE
  * @author Sean Strout @ RIT CS
  * @author James Heliotis @ RIT CS
+ * @author Tyson Levy
  */
 public class NetworkClient {
 
@@ -46,32 +47,32 @@ public class NetworkClient {
     }
 
     /**
-     * The {@link Socket} used to communicate with the reversi server.
+     * The {@link Socket} used to communicate with the place server.
      */
     private Socket sock;
 
     /**
-     * The {@link Scanner} used to read requests from the reversi server.
+     * The {@link Scanner} used to read requests from the place server.
      */
     private ObjectInputStream networkIn;
 
     /**
-     * The {@link PrintStream} used to write responses to the reversi server.
+     * The {@link PrintStream} used to write responses to the okace server.
      */
     private ObjectOutputStream networkOut;
 
     /**
      * The {@link ClientModel} used to keep track of the state of the game.
      */
-    private ClientModel game;
+    public ClientModel game;
 
     /**
      * Sentinel used to control the main game loop.
      */
     private boolean go;
-
-    private boolean ready = false;
-
+    /**
+     * Username for the connection. Used when sending moves.
+     */
     private String username;
 
     /**
@@ -91,12 +92,8 @@ public class NetworkClient {
     }
 
     /**
-     * Hook up with a Reversi game server already running and waiting for
-     * two players to connect. Because of the nature of the server
-     * protocol, this constructor actually blocks waiting for the first
-     * message from the server that tells it how big the board will be.
-     * Afterwards a thread that listens for server messages and forwards
-     * them to the game object is started.
+     * Hook up with a Place game server already running and waiting for
+     * clients to connect.
      *
      * @param hostname the name of the host running the server program
      * @param port     the port of the server socket on which the server is
@@ -107,21 +104,13 @@ public class NetworkClient {
      */
     public NetworkClient( String hostname, int port, String username, ClientModel model )
             throws PlaceException {
-
         try {
             this.sock = new Socket( hostname, port );
             this.networkOut = new ObjectOutputStream( sock.getOutputStream() );
-            //this.networkOut.flush();
             this.networkIn = new ObjectInputStream( sock.getInputStream() );
             this.game = model;
             this.username = username;
             this.go = true;
-
-            //this.networkOut.writeUnshared(new PlaceRequest<>(PlaceRequest.RequestType.LOGIN, username));
-            //this.networkOut.flush();
-
-            // Block waiting for the CONNECT message from the server.
-
 
             // Run rest of client in separate thread.
             // This threads stops on its own at the end of the game and
@@ -134,21 +123,8 @@ public class NetworkClient {
         catch( IOException e ) {
             throw new PlaceException( e );
         }
-
     }
 
-    /**
-     * Called when the server sends a message saying that
-     * gameplay is damaged. Ends the game.
-     *
-     * @param arguments The error message sent from the reversi.server.
-     */
-    public void error( String arguments ) {
-        NetworkClient.dPrint( '!' + PlaceRequest.RequestType.ERROR.toString() + ',' + arguments );
-        dPrint( "Fatal error: " + arguments );
-        //this.game.error( arguments );
-        this.stop();
-    }
 
     /**
      * This method should be called at the end of the game to
@@ -179,52 +155,46 @@ public class NetworkClient {
             System.exit(-1);
         }
 
-        while ( this.goodToGo() ) {
-            try {
-                PlaceRequest<?> request = (PlaceRequest<?>) networkIn.readUnshared();
-                if (request.getType() == PlaceRequest.RequestType.LOGIN_SUCCESS) {
-                    System.out.println("Login Success");
-                } else if (request.getType() == PlaceRequest.RequestType.ERROR){
-                    System.err.println((String) request.getData());
-                }else if(request.getType() == PlaceRequest.RequestType.BOARD){
-                    game.initBoard((PlaceBoard) request.getData());
-                    System.out.println("Board received: " + request.getData());
-                    ready = true;
-                }else if(request.getType() == PlaceRequest.RequestType.TILE_CHANGED){
-                    game.setTile((PlaceTile) request.getData());
-                    System.out.println("\nTile Changed: " + request.getData());
-                    System.out.println(game.toString());
-                }
+        while(this.goodToGo()) try {
+            PlaceRequest<?> request = (PlaceRequest<?>) networkIn.readUnshared();
+            if (request.getType() == PlaceRequest.RequestType.LOGIN_SUCCESS) {
+                System.out.println("Login Success");
+            } else if (request.getType() == PlaceRequest.RequestType.ERROR) {
+                System.err.println((String) request.getData());
+            } else if (request.getType() == PlaceRequest.RequestType.BOARD) {
+                game.initBoard((PlaceBoard) request.getData());
+                System.out.println("Board received: " + request.getData());
+            } else if (request.getType() == PlaceRequest.RequestType.TILE_CHANGED) {
+                game.setTile((PlaceTile) request.getData());
+                System.out.println("\nTile Changed: " + request.getData());
+                System.out.println(game.toString());
             }
-
-            catch( NoSuchElementException nse ) {
-                // Looks like the connection shut down.
-                this.error( "Lost connection to server." );
-                this.stop();
-            }
-            catch( Exception e ) {
-                this.error( e.getMessage() + '?' );
-                this.stop();
-            }
+        } catch (NoSuchElementException nse) {
+            // Looks like the connection shut down.
+            this.stop();
+        } catch (Exception e) {
+            this.stop();
         }
         this.close();
     }
 
     private void run2() {
-
         try {
             Scanner in = new Scanner(System.in);
-
             while (true) {
+
                 try{
+                    //Sleeps half a second after tiles are changed by the client
                     Thread.sleep(500);
                 }
                 catch (InterruptedException e){}
+
                 System.out.println("Send move as: row col color");
                 int row = in.nextInt();
                 int col = in.nextInt();
                 int colorNum = in.nextInt();
                 PlaceColor color = PlaceColor.BLACK;
+                //Get the right color, Black by default
                 for(PlaceColor c: PlaceColor.values()){
                     if(c.getNumber() == colorNum){
                         color = c;
