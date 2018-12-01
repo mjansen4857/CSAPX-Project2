@@ -62,6 +62,7 @@ public class PlaceGUI extends Application implements Observer {
             for (int j = 0; j < model.getDim(); j++) {
                 Button btn = new Button("");
                 btn.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+                btn.setPrefSize(600/model.getDim(), 600/model.getDim());
 
                 int row = i;
                 int column = j;
@@ -93,6 +94,8 @@ public class PlaceGUI extends Application implements Observer {
 
             String hexColor = hexColor(getColor(i));
             btn.setStyle("-fx-background-color: #" + hexColor + "; ");
+            btn.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+            btn.setPrefWidth(600/model.getDim());
             bottom.add(btn, i, 0);
         }
 
