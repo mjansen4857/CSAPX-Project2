@@ -74,59 +74,49 @@ public class PlaceGUI extends Application implements Observer {
                                     }
                 });
 
-                PlaceColor col = model.getTile(j,i).getColor();
-                String red = Integer.toHexString(col.getRed());
-                if(red.length() == 1){ red = "0" + red; }
-                String green = Integer.toHexString(col.getGreen());
-                if(green.length() == 1){ green = "0" + green; }
-                String blue = Integer.toHexString(col.getBlue());
-                if(blue.length() == 1){ blue = "0" + blue; }
-                String hexColor = red + green + blue;
-
+                String hexColor = hexColor(model.getTile(j,i).getColor());
                 btn.setStyle("-fx-background-color: #" + hexColor + "; ");
+
                 grid.add(btn,j,i);
             }
         }
 
         GridPane bottom = new GridPane();
         for(int i=0; i<16; i++){
+
             Button btn = new Button(Integer.toString(i+1));
+
             int x = i;
             btn.setOnAction(new EventHandler<ActionEvent>() {
-                @Override public void handle(ActionEvent e) {
-                    for (PlaceColor c : PlaceColor.values()) {
-                        if (c.getNumber() == x) {
-                            color = c;
-                            break;
-                        }
-                    }
-                }
+                @Override public void handle(ActionEvent e) { color = getColor(x); }
             });
-            PlaceColor col = PlaceColor.BLACK;
-            for (PlaceColor c : PlaceColor.values()) {
-                if (c.getNumber() == i) {
-                    col = c;
-                    break;
-                }
-            }
 
-            String red = Integer.toHexString(col.getRed());
-            if(red.length() == 1){ red = "0" + red; }
-            String green = Integer.toHexString(col.getGreen());
-            if(green.length() == 1){ green = "0" + green; }
-            String blue = Integer.toHexString(col.getBlue());
-            if(blue.length() == 1){ blue = "0" + blue; }
-            String hexColor = red + green + blue;
-
+            String hexColor = hexColor(getColor(i));
             btn.setStyle("-fx-background-color: #" + hexColor + "; ");
             bottom.add(btn, i, 0);
         }
 
         mainPane.setCenter(grid);
         mainPane.setBottom(bottom);
-        Scene scene = new Scene(mainPane);
+        Scene scene = new Scene(mainPane, 600, 600);
         mainStage.setScene(scene);
         mainStage.show();
+    }
+
+    @Override
+    public void update(Observable t, Object o) {
+
+        assert t == this.model: "Update from non-model Observable";
+        if(firstUpdate){firstUpdate = false;}
+        else{
+            for (int i = 0; i < model.getDim(); i++) {
+                for (int j = 0; j < model.getDim(); j++) {
+                    String hexColor = hexColor(model.getTile(j, i).getColor());
+                    getButtonFromGridPane((GridPane) mainPane.getCenter(), i, j).setStyle("-fx-background-color: #" + hexColor + "; ");
+                }
+            }
+        }
+
     }
 
     private Button getButtonFromGridPane(GridPane gridPane, int col, int row) {
@@ -138,35 +128,25 @@ public class PlaceGUI extends Application implements Observer {
         return null;
     }
 
-    @Override
-    public void update(Observable t, Object o) {
-
-        assert t == this.model: "Update from non-model Observable";
-        if(firstUpdate){firstUpdate = false;}
-        else{
-            for (int i = 0; i < model.getDim(); i++) {
-                for (int j = 0; j < model.getDim(); j++) {
-
-                    PlaceColor col = model.getTile(j, i).getColor();
-                    String red = Integer.toHexString(col.getRed());
-                    if (red.length() == 1) {
-                        red = "0" + red;
-                    }
-                    String green = Integer.toHexString(col.getGreen());
-                    if (green.length() == 1) {
-                        green = "0" + green;
-                    }
-                    String blue = Integer.toHexString(col.getBlue());
-                    if (blue.length() == 1) {
-                        blue = "0" + blue;
-                    }
-                    String hexColor = red + green + blue;
-
-                    getButtonFromGridPane((GridPane) mainPane.getCenter(), i, j).setStyle("-fx-background-color: #" + hexColor + "; ");
-                }
-            }
+    private String hexColor(PlaceColor col){
+        String red = Integer.toHexString(col.getRed());
+        if (red.length() == 1) {
+            red = "0" + red;
         }
+        String green = Integer.toHexString(col.getGreen());
+        if (green.length() == 1) {
+            green = "0" + green;
+        }
+        String blue = Integer.toHexString(col.getBlue());
+        if (blue.length() == 1) {
+            blue = "0" + blue;
+        }
+        return red + green + blue;
+    }
 
+    private PlaceColor getColor(int i){
+        for (PlaceColor c : PlaceColor.values()) { if (c.getNumber() == i) { return c; } }
+        return null;
     }
 
     public static void main(String[] args) {
