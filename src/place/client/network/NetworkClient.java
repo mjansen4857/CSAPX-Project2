@@ -128,11 +128,13 @@ public class NetworkClient {
         try {
             if (row != -1) {
                 networkOut.writeUnshared(new PlaceRequest<>(PlaceRequest.RequestType.CHANGE_TILE, new PlaceTile(row, col, username, color)));
+                Thread.sleep(500);
             }
             else{
                 this.close();
             }
         }
+        catch (InterruptedException e){}
         catch (IOException e){}
     }
 

@@ -98,12 +98,6 @@ public class PlacePTUI extends ConsoleApplication implements Observer {
                 color = PlaceColor.BLACK;
             }
             serverConn.sendMove(row, col, color);
-
-            try{
-                //Sleeps half a second after tiles are changed by the client
-                Thread.sleep(500);
-            }
-            catch (InterruptedException e){}
         }
         System.out.println("Disconnected");
         System.exit(0);

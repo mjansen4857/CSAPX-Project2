@@ -12,6 +12,8 @@ public class ClientModel extends Observable {
 
     private boolean running = true;
 
+    private PlaceTile lastTileChanged;
+
     /**
      * Create a new board of all white tiles.
      */
@@ -47,6 +49,7 @@ public class ClientModel extends Observable {
      */
     public void setTile(PlaceTile tile) {
         this.board.setTile(tile);
+        this.lastTileChanged = tile;
         super.setChanged();
         super.notifyObservers();
     }
@@ -68,6 +71,8 @@ public class ClientModel extends Observable {
     public int getDim(){
         return board.DIM;
     }
+
+    public PlaceTile getLastTileChanged(){return lastTileChanged;}
 
     /**
      * Return a string representation of the board.  It displays the tile color as

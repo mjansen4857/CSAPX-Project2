@@ -67,12 +67,8 @@ public class PlaceGUI extends Application implements Observer {
                 int row = i;
                 int column = j;
                 btn.setOnAction(new EventHandler<ActionEvent>() {
-                                    @Override
-                                    public void handle(ActionEvent e) {
-                                        serverConn.sendMove(row, column, color);
-                                        try {Thread.sleep(500); }
-                                        catch (InterruptedException er){}
-                                    }
+                    @Override
+                    public void handle(ActionEvent e) { serverConn.sendMove(row, column, color); }
                 });
 
                 String hexColor = hexColor(model.getTile(j,i).getColor());
@@ -95,7 +91,7 @@ public class PlaceGUI extends Application implements Observer {
             String hexColor = hexColor(getColor(i));
             btn.setStyle("-fx-background-color: #" + hexColor + "; ");
             btn.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
-            btn.setPrefWidth(600/model.getDim());
+            btn.setPrefWidth(600/16);
             bottom.add(btn, i, 0);
         }
 
@@ -112,12 +108,9 @@ public class PlaceGUI extends Application implements Observer {
         assert t == this.model: "Update from non-model Observable";
         if(firstUpdate){firstUpdate = false;}
         else{
-            for (int i = 0; i < model.getDim(); i++) {
-                for (int j = 0; j < model.getDim(); j++) {
-                    String hexColor = hexColor(model.getTile(j, i).getColor());
-                    getButtonFromGridPane((GridPane) mainPane.getCenter(), i, j).setStyle("-fx-background-color: #" + hexColor + "; ");
-                }
-            }
+            PlaceTile tile = model.getLastTileChanged();
+            String hexColor = hexColor(tile.getColor());
+            getButtonFromGridPane((GridPane) mainPane.getCenter(), tile.getCol(), tile.getRow()).setStyle("-fx-background-color: #" + hexColor + "; ");
         }
 
     }
