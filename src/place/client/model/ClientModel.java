@@ -65,6 +65,10 @@ public class ClientModel extends Observable {
         this.running = false;
     }
 
+    public int getDim(){
+        return board.DIM;
+    }
+
     /**
      * Return a string representation of the board.  It displays the tile color as
      * a single character hex value in the range 0-F.

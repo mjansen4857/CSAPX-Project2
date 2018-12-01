@@ -3,13 +3,7 @@ package place.client.ptui;
 import place.*;
 import place.client.model.ClientModel;
 import place.client.network.NetworkClient;
-import place.network.PlaceRequest;
-
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
-import java.net.Socket;
 import java.util.*;
 
 public class PlacePTUI extends ConsoleApplication implements Observer {
