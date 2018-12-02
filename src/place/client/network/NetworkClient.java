@@ -75,12 +75,16 @@ public class NetworkClient {
      */
     private String username;
 
+    private boolean loaded = false;
+
+    public synchronized boolean isLoaded(){return loaded;}
+
     /**
      * Accessor that takes multithreaded access into account
      *
      * @return whether it ok to continue or not
      */
-    private synchronized boolean goodToGo() {
+    public synchronized boolean goodToGo() {
         return this.go;
     }
 
@@ -180,6 +184,7 @@ public class NetworkClient {
             } else if (request.getType() == PlaceRequest.RequestType.BOARD) {
                 game.initBoard((PlaceBoard) request.getData());
                 System.out.println("Board received:");
+                this.loaded = true;
             } else if (request.getType() == PlaceRequest.RequestType.TILE_CHANGED) {
                 System.out.println("\nTile Changed: " + request.getData());
                 game.setTile((PlaceTile) request.getData());

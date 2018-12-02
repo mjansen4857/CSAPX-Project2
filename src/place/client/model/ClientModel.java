@@ -12,6 +12,8 @@ public class ClientModel extends Observable {
 
     private boolean running = true;
 
+    private boolean ready;
+
     private PlaceTile lastTileChanged;
 
     /**
@@ -56,6 +58,7 @@ public class ClientModel extends Observable {
 
     public void initBoard(PlaceBoard game){
         board = game;
+        this.ready = true;
         super.setChanged();
         super.notifyObservers();
     }
@@ -68,9 +71,9 @@ public class ClientModel extends Observable {
         this.running = false;
     }
 
-    public int getDim(){
-        return board.DIM;
-    }
+    public int getDim(){ return board.DIM; }
+
+    public boolean isReady(){return ready; }
 
     public PlaceTile getLastTileChanged(){return lastTileChanged;}
 
