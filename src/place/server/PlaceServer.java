@@ -8,6 +8,7 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.HashMap;
@@ -18,6 +19,8 @@ public class PlaceServer{
     private PlaceBoard board;
     private volatile boolean running = true;
     private HashMap<String, ClientThread> clients;
+    private InetAddress lastConnect = null;
+    private int dupeCount = 0;
 
     public PlaceServer(int port, int dim){
         try {
@@ -36,7 +39,6 @@ public class PlaceServer{
             board.setTile(tile);
             for(ClientThread client:clients.values()){
                 client.sendMessage(new PlaceRequest<>(PlaceRequest.RequestType.TILE_CHANGED, tile));
-                //client.sendMessage(new PlaceRequest<>(PlaceRequest.RequestType.BOARD, board));
             }
         }
     }
@@ -52,14 +54,27 @@ public class PlaceServer{
                 System.out.println("Waiting for connection...");
                 Socket socket = server.accept();
                 System.out.println("Incoming connection from " + socket);
-                new Thread(new ClientThread(socket)).start();
+                if(lastConnect != null){
+                    if(lastConnect.equals(socket.getInetAddress())){
+                        dupeCount++;
+                    }else{
+                        dupeCount = 0;
+                    }
+                }
+                lastConnect = socket.getInetAddress();
+                if(dupeCount < 5) {
+                    new Thread(new ClientThread(socket)).start();
+                }else {
+                    System.out.println("Prevented connection from " + socket + " for too many connections from that address in a row");
+                    socket.close();
+                }
             }catch (IOException e){
                 e.printStackTrace();
             }
         }
     }
 
-    public class ClientThread implements Runnable{
+    private class ClientThread implements Runnable{
         private Socket socket;
         private ObjectInputStream in;
         private ObjectOutputStream out;
