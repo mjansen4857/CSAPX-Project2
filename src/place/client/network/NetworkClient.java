@@ -76,6 +76,7 @@ public class NetworkClient {
     private String username;
 
     private boolean loaded = false;
+    private long lastSendTime = 0;
 
     public synchronized boolean isLoaded(){return loaded;}
 
@@ -129,17 +130,18 @@ public class NetworkClient {
     }
 
     public void sendMove(int row, int col, PlaceColor color) {
-        try {
-            if (row != -1) {
-                networkOut.writeUnshared(new PlaceRequest<>(PlaceRequest.RequestType.CHANGE_TILE, new PlaceTile(row, col, username, color)));
-                Thread.sleep(500);
-            }
-            else{
-                this.close();
+        if(System.currentTimeMillis() - lastSendTime >= 2000) {
+            lastSendTime = System.currentTimeMillis();
+            try {
+                if (row != -1) {
+                    networkOut.writeUnshared(new PlaceRequest<>(PlaceRequest.RequestType.CHANGE_TILE, new PlaceTile(row, col, username, color, System.currentTimeMillis())));
+                } else {
+                    this.close();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         }
-        catch (InterruptedException e){}
-        catch (IOException e){}
     }
 
     /**
