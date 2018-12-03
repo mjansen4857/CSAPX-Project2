@@ -127,6 +127,11 @@ public class PlaceGUI extends Application implements Observer {
     }
 
     @Override
+    public void stop(){
+        serverConn.close();
+    }
+
+    @Override
     public void update(Observable t, Object o) {
 
         assert t == this.model: "Update from non-model Observable";
