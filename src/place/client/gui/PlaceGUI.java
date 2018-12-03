@@ -1,34 +1,22 @@
 package place.client.gui;
 
 import javafx.application.Application;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
-import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.control.Button;
-import javafx.scene.control.Toggle;
-import javafx.scene.control.ToggleButton;
-import javafx.scene.control.ToggleGroup;
+import javafx.scene.control.*;
 import javafx.scene.input.MouseButton;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 import place.PlaceColor;
 import place.PlaceException;
 import place.PlaceTile;
 import place.client.model.ClientModel;
 import place.client.network.NetworkClient;
-
-import java.io.BufferedWriter;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
@@ -40,7 +28,6 @@ public class PlaceGUI extends Application implements Observer {
     private BorderPane mainPane;
     private PlaceColor color = PlaceColor.BLACK;
     private boolean firstUpdate = true;
-    private Node lastToggle;
     private Canvas canvas;
     private static final double SIZE = 600;
 
@@ -71,38 +58,7 @@ public class PlaceGUI extends Application implements Observer {
     public synchronized void start(Stage mainStage) {
         while(!serverConn.isLoaded()) {}
         mainPane = new BorderPane();
-
-//        ToggleGroup tg = new ToggleGroup();
-//        tg.selectedToggleProperty().addListener(new ChangeListener<Toggle>() {
-//            public void changed(ObservableValue<? extends Toggle> ov, Toggle toggle, Toggle new_toggle) {
-//                try {
-//                    serverConn.sendMove(GridPane.getRowIndex((Node) tg.getSelectedToggle()), GridPane.getColumnIndex((Node) tg.getSelectedToggle()), color);
-//                    lastToggle = (Node) tg.getSelectedToggle();
-//                }
-//                catch (NullPointerException e){serverConn.sendMove(GridPane.getRowIndex(lastToggle), GridPane.getColumnIndex(lastToggle), color);}
-//            }
-//        });
-//
-//        GridPane grid = new GridPane();
-//        for (int i = 0; i < model.getDim(); i++) {
-//            for (int j = 0; j < model.getDim(); j++) {
-//                Rectangle rec = new Rectangle(SIZE / model.getDim(), SIZE / model.getDim());
-//                ToggleButton btn = new ToggleButton("");
-//                btn.setPrefSize(SIZE / model.getDim(), SIZE / model.getDim());
-//
-//                String hexColor = hexColor(model.getTile(j, i).getColor());
-//                rec.setFill(Color.valueOf(hexColor));
-//                btn.setToggleGroup(tg);
-//
-//                btn.setOpacity(0);
-//                //btn.setContentAreaFilled(false);
-//                //btn.setBorderPainted(false);
-//
-//                grid.add(rec, j, i);
-//                grid.add(btn,j,i);
-//
-//            }
-//        }
+        mainStage.setTitle("Place: " + serverConn.getUsername());
 
         this.canvas = new Canvas(SIZE, SIZE);
         canvas.setOnMouseClicked((event) -> {
@@ -112,6 +68,18 @@ public class PlaceGUI extends Application implements Observer {
                 int col = (int) (event.getX()/size);
                 serverConn.sendMove(row, col, color);
             }
+        });
+        Tooltip tp = new Tooltip();
+        canvas.setOnMouseMoved((event) -> {
+            double size = SIZE/model.getDim();
+            int row = (int) (event.getY()/size);
+            int col = (int) (event.getX()/size);
+            PlaceTile tile = model.getTile(row, col);
+            tp.setText("(" + row + "," + col + ")\n" +
+                    tile.getOwner() + "\n" +
+                    new SimpleDateFormat("MM/dd/yy HH:mm:ss").format(new Date(tile.getTime())) + "\n" +
+                    tile.getColor().getName());
+            tp.show(canvas, event.getScreenX() + 10, event.getScreenY() + 10);
         });
         drawBoard();
 
@@ -152,8 +120,6 @@ public class PlaceGUI extends Application implements Observer {
         else{
             PlaceTile tile = model.getLastTileChanged();
             updateCanvas(tile);
-//            String hexColor = hexColor(tile.getColor());
-//            getRectFromGridPane((GridPane) mainPane.getCenter(), tile.getCol(), tile.getRow()).setFill(Color.valueOf(hexColor));
         }
     }
 
@@ -175,24 +141,6 @@ public class PlaceGUI extends Application implements Observer {
         double size = SIZE/model.getDim();
         g.setFill(Color.valueOf(hexColor(tile.getColor())));
         g.fillRect(tile.getCol()*size, tile.getRow()*size, size, size);
-    }
-
-    private Rectangle getRectFromGridPane(GridPane gridPane, int col, int row) {
-        for (Node node : gridPane.getChildren()) {
-            if (GridPane.getColumnIndex(node) == col && GridPane.getRowIndex(node) == row) {
-                if(node instanceof Rectangle){return (Rectangle) node;}
-            }
-        }
-        return null;
-    }
-
-    private ToggleButton getButtonFromGridPane(GridPane gridPane, int col, int row) {
-        for (Node node : gridPane.getChildren()) {
-            if (GridPane.getColumnIndex(node) == col && GridPane.getRowIndex(node) == row) {
-                if(node instanceof ToggleButton){return (ToggleButton) node;}
-            }
-        }
-        return null;
     }
 
     private String hexColor(PlaceColor col){

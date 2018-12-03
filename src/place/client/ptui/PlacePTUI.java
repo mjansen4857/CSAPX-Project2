@@ -1,5 +1,7 @@
 package place.client.ptui;
 
+import javafx.application.Application;
+import javafx.application.Platform;
 import place.*;
 import place.client.model.ClientModel;
 import place.client.network.NetworkClient;
@@ -92,12 +94,12 @@ public class PlacePTUI extends ConsoleApplication implements Observer {
                         break;
                     }
                 }
+                serverConn.sendMove(row, col, color);
             }
-            else{
-                col = 0;
-                color = PlaceColor.BLACK;
+            else {
+                stop();
+                System.exit(0);
             }
-            serverConn.sendMove(row, col, color);
         }
         System.out.println("Disconnected");
         System.exit(0);
