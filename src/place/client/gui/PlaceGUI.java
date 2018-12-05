@@ -35,6 +35,9 @@ public class PlaceGUI extends Application implements Observer {
     private Canvas canvas;
     private static final double SIZE = 600;
     private Tooltip tp;
+    private double scale = 0.75;
+    private Point anchor = new Point(0, 0);
+    private Point dragStart = new Point();
 
     public void init(){
         List< String > args = super.getParameters().getRaw();
@@ -75,25 +78,55 @@ public class PlaceGUI extends Application implements Observer {
         canvas.setOnMouseClicked((event) -> {
             if(event.getButton() == MouseButton.PRIMARY){
                 double size = SIZE/model.getDim();
-                int row = (int) (event.getY()/size);
-                int col = (int) (event.getX()/size);
+                int row = (int) ((event.getY()+anchor.getY())/(size*scale));
+                int col = (int) ((event.getX()+anchor.getX())/(size*scale));
                 serverConn.sendMove(row, col, color);
             }
         });
-        
+        canvas.setOnScroll((event) -> {
+            if(event.getDeltaY() < 0){
+                scale -= 0.001 * model.getDim()/20 * Math.abs(event.getDeltaY());
+            }else{
+                scale += 0.001 * model.getDim()/20 * Math.abs(event.getDeltaY());
+            }
+            System.out.println(scale);
+            drawBoard();
+        });
+        canvas.setOnMousePressed((event) -> {
+            if(event.getButton() == MouseButton.SECONDARY){
+                dragStart.x = (int) event.getX();
+                dragStart.y = (int) event.getY();
+                System.out.println(dragStart);
+            }
+        });
+        canvas.setOnMouseDragged((event) -> {
+            if(event.getButton() == MouseButton.SECONDARY){
+                System.out.println("Add x: " + (event.getX() - dragStart.getX()));
+                anchor.x -= (event.getX() - dragStart.getX());
+                anchor.y -= (event.getY() - dragStart.getY());
+                dragStart.x = (int) event.getX();
+                dragStart.y = (int) event.getY();
+                drawBoard();
+            }
+        });
+
         new Thread(() -> {
             double size = SIZE / model.getDim();
             while (serverConn.goodToGo()) {
                 Point p = MouseInfo.getPointerInfo().getLocation();
                 if (p.getX() >= mainStage.getX() + 10 && p.getX() <= mainStage.getX() + mainStage.getWidth() - 10) {
                     if (p.getY() >= mainStage.getY() + 30 && p.getY() <= mainStage.getY() + mainStage.getHeight() - 40) {
-                        int row = (int) ((p.getY() - mainStage.getY() - 28) / size);
-                        int col = (int) ((p.getX() - mainStage.getX() - 6) / size);
-                        PlaceTile tile = model.getTile(row, col);
-                        Platform.runLater(() -> updateTooltip("Pos: (" + row + "," + col + ")\n" +
-                                "Owner: " + tile.getOwner() + "\n" +
-                                "Time: " + new SimpleDateFormat("MM/dd/yy HH:mm:ss").format(new Date(tile.getTime())) + "\n" +
-                                "Color: " + tile.getColor().getName(), p.getX() + 10, p.getY() + 10));
+                        int row = (int) (((p.getY() - mainStage.getY() - 28)+anchor.getY()) / (size*scale));
+                        int col = (int) (((p.getX() - mainStage.getX() - 6)+anchor.getX()) / (size*scale));
+                        if(row < model.getDim() && col < model.getDim() && row >= 0 && col >= 0) {
+                            PlaceTile tile = model.getTile(row, col);
+                            Platform.runLater(() -> updateTooltip("Pos: (" + row + "," + col + ")\n" +
+                                    "Owner: " + tile.getOwner() + "\n" +
+                                    "Time: " + new SimpleDateFormat("MM/dd/yy HH:mm:ss").format(new Date(tile.getTime())) + "\n" +
+                                    "Color: " + tile.getColor().getName(), p.getX() + 10, p.getY() + 10));
+                        }else {
+                            Platform.runLater(() -> tp.hide());
+                        }
                     } else {
                         Platform.runLater(() -> tp.hide());
                     }
@@ -157,7 +190,7 @@ public class PlaceGUI extends Application implements Observer {
             for(int j = 0; j < model.getDim(); j++){
                 PlaceTile tile = model.getTile(i, j);
                 g.setFill(Color.valueOf(hexColor(tile.getColor())));
-                g.fillRect(size*j, size*i, size, size);
+                g.fillRect(size*j*scale - anchor.getX(), size*i*scale - anchor.getY(), size*scale, size*scale);
             }
         }
     }
@@ -166,7 +199,7 @@ public class PlaceGUI extends Application implements Observer {
         GraphicsContext g = canvas.getGraphicsContext2D();
         double size = SIZE/model.getDim();
         g.setFill(Color.valueOf(hexColor(tile.getColor())));
-        g.fillRect(tile.getCol()*size, tile.getRow()*size, size, size);
+        g.fillRect(tile.getCol()*size*scale - anchor.getX(), tile.getRow()*size*scale - anchor.getY(), size*scale, size*scale);
     }
 
     private String hexColor(PlaceColor col){
