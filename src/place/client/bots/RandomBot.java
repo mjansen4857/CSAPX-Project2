@@ -59,7 +59,7 @@ public class RandomBot extends ConsoleApplication implements Observer {
 
         assert t == this.model: "Update from non-model Observable";
 
-        System.out.println(serverConn.game.toString()+"\n");
+        //System.out.println(serverConn.game.toString()+"\n");
 
         if(firstUpdate){
             firstUpdate = false;

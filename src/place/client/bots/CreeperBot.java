@@ -14,9 +14,11 @@ public class CreeperBot extends ConsoleApplication implements Observer {
     private NetworkClient serverConn;
     private boolean firstUpdate = true;
 
-    private PlaceColor[][] picture = new PlaceColor[8][8];
+    private PlaceColor[][] picture;
 
     public void init() {
+
+        picture = new PlaceColor[8][8];
 
         for(int i=0; i<8; i++){
             for(int j=0; j<8; j++){
@@ -87,7 +89,7 @@ public class CreeperBot extends ConsoleApplication implements Observer {
 
         assert t == this.model: "Update from non-model Observable";
 
-        System.out.println(serverConn.game.toString()+"\n");
+        //System.out.println(serverConn.game.toString()+"\n");
 
         if(firstUpdate){
             firstUpdate = false;
