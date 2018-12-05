@@ -20,7 +20,7 @@ public class PlaceServer{
     private volatile boolean running = true;
     private HashMap<String, ClientThread> clients;
     private InetAddress lastConnect = null;
-    private int dupeCount = 0;
+    private long lastConnectTime = 0;
 
     public PlaceServer(int port, int dim){
         try {
@@ -55,19 +55,15 @@ public class PlaceServer{
                 Socket socket = server.accept();
                 System.out.println("Incoming connection from " + socket);
                 if(lastConnect != null){
-                    if(lastConnect.equals(socket.getInetAddress())){
-                        dupeCount++;
-                    }else{
-                        dupeCount = 0;
+                    if(lastConnect.equals(socket.getInetAddress()) && System.currentTimeMillis() - lastConnectTime < 100){
+                        System.out.println("Prevented connection from " + socket + " for too many connections from that address in a row");
+                        socket.close();
+                        continue;
                     }
                 }
                 lastConnect = socket.getInetAddress();
-                if(dupeCount < 5) {
-                    new Thread(new ClientThread(socket)).start();
-                }else {
-                    System.out.println("Prevented connection from " + socket + " for too many connections from that address in a row");
-                    socket.close();
-                }
+                lastConnectTime = System.currentTimeMillis();
+                new Thread(new ClientThread(socket)).start();
             }catch (IOException e){
                 e.printStackTrace();
             }
