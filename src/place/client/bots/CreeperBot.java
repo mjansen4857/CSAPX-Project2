@@ -108,9 +108,11 @@ public class CreeperBot extends ConsoleApplication implements Observer {
         }
         while (serverConn.game.isRunning()){
             for (int i=row; i<row+picture.length; i++){
-                for(int j=col; j<col+picture[i].length; j++){
-                    serverConn.sendMove(i,j,picture[i-row][j-col]);
-                    try{Thread.sleep(500);}catch (InterruptedException e){}
+                for(int j=col; j<col+picture[0].length; j++) {
+                    if (model.getTile(i, j).getColor() != picture[i - row][j - col]) {
+                        serverConn.sendMove(i, j, picture[i - row][j - col]);
+                        try { Thread.sleep(500); } catch (InterruptedException e) { }
+                    }
                 }
             }
         }
