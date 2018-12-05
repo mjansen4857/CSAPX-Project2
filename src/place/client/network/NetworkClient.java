@@ -134,7 +134,7 @@ public class NetworkClient {
     }
 
     public void sendMove(int row, int col, PlaceColor color) {
-        if(System.currentTimeMillis() - lastSendTime >= 2000) {
+        if(System.currentTimeMillis() - lastSendTime >= 500) {
             lastSendTime = System.currentTimeMillis();
             try {
                 if (row != -1) {
