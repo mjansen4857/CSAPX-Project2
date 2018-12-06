@@ -192,7 +192,7 @@ public class NetworkClient {
                 System.out.println("Board received:");
                 this.loaded = true;
             } else if (request.getType() == PlaceRequest.RequestType.TILE_CHANGED) {
-                System.out.println("\nTile Changed: " + request.getData());
+                //System.out.println("\nTile Changed: " + request.getData());
                 game.setTile((PlaceTile) request.getData());
             }
         } catch (NoSuchElementException nse) {
