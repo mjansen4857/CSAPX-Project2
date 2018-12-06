@@ -18,26 +18,6 @@ public class RainbowBot extends ConsoleApplication implements Observer {
 
     public void init() {
 
-        picture = new PlaceColor[6][serverConn.game.getDim()];
-
-        for(int i=0; i<5; i++){
-            for(int j=0; j<picture[0].length; j++){
-                switch (i){
-                    case 0: picture[i][j] = PlaceColor.RED;
-                        break;
-                    case 1: picture[i][j] = PlaceColor.YELLOW;
-                        break;
-                    case 2: picture[i][j] = PlaceColor.LIME;
-                        break;
-                    case 3: picture[i][j] = PlaceColor.BLUE;
-                        break;
-                    case 4: picture[i][j] = PlaceColor.PURPLE;
-                        break;
-                    default: picture[i][j] = PlaceColor.BLACK;
-                        break;
-                }
-            }
-        }
 
         List< String > args = super.getArguments();
 
@@ -92,6 +72,33 @@ public class RainbowBot extends ConsoleApplication implements Observer {
 
     private void run() {
 
+        picture = new PlaceColor[6][serverConn.game.getDim()];
+
+        for(int i=0; i<5; i++) {
+            for (int j = 0; j < picture[0].length; j++) {
+                switch (i) {
+                    case 0:
+                        picture[i][j] = PlaceColor.RED;
+                        break;
+                    case 1:
+                        picture[i][j] = PlaceColor.YELLOW;
+                        break;
+                    case 2:
+                        picture[i][j] = PlaceColor.LIME;
+                        break;
+                    case 3:
+                        picture[i][j] = PlaceColor.BLUE;
+                        break;
+                    case 4:
+                        picture[i][j] = PlaceColor.FUCHSIA;
+                        break;
+                    default:
+                        picture[i][j] = PlaceColor.BLACK;
+                        break;
+                }
+            }
+        }
+
         int row = 0;
         int col = 0;
         if(row + picture.length >= serverConn.game.getDim() || col + picture[0].length >= serverConn.game.getDim()){ row = 0; col = 0; }
@@ -116,7 +123,7 @@ public class RainbowBot extends ConsoleApplication implements Observer {
 
     public static void main(String[] args) {
         if(args.length != 3){
-            System.err.println("Usage: java CreeperBot host port username");
+            System.err.println("Usage: java RainbowBot host port username");
             System.exit(0);
         }
         ConsoleApplication.launch(RainbowBot.class, args);
