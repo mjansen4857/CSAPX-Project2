@@ -72,7 +72,7 @@ public class RainbowBot extends ConsoleApplication implements Observer {
 
     private void run() {
 
-        picture = new PlaceColor[6][serverConn.game.getDim()];
+        picture = new PlaceColor[5][serverConn.game.getDim()];
 
         for(int i=0; i<5; i++) {
             for (int j = 0; j < picture[0].length; j++) {

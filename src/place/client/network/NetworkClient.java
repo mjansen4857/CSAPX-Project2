@@ -162,6 +162,7 @@ public class NetworkClient {
         }
         catch( IOException ioe ) {
             // squash
+            ioe.printStackTrace();
         }
         this.game.close();
     }
@@ -177,7 +178,7 @@ public class NetworkClient {
             this.networkOut.writeUnshared(new PlaceRequest<>(PlaceRequest.RequestType.LOGIN, this.username));
         }
         catch (IOException e){
-            System.err.println(e);
+            e.printStackTrace();
             System.exit(-1);
         }
 
@@ -197,8 +198,10 @@ public class NetworkClient {
             }
         } catch (NoSuchElementException nse) {
             // Looks like the connection shut down.
+            nse.printStackTrace();
             this.stop();
         } catch (Exception e) {
+            e.printStackTrace();
             this.stop();
         }
         this.close();
