@@ -35,7 +35,7 @@ public class PlaceGUI extends Application implements Observer {
     private Canvas canvas;
     private static final double SIZE = 600;
     private Tooltip tp;
-    private double scale = 0.75;
+    private double scale = 1;
     private Point anchor = new Point(0, 0);
     private Point dragStart = new Point();
 
@@ -89,7 +89,7 @@ public class PlaceGUI extends Application implements Observer {
             }else{
                 scale += 0.001 * model.getDim()/20 * Math.abs(event.getDeltaY());
             }
-            System.out.println(scale);
+            scale = Math.max(1, scale);
             drawBoard();
         });
         canvas.setOnMousePressed((event) -> {
@@ -101,9 +101,10 @@ public class PlaceGUI extends Application implements Observer {
         });
         canvas.setOnMouseDragged((event) -> {
             if(event.getButton() == MouseButton.SECONDARY){
-                System.out.println("Add x: " + (event.getX() - dragStart.getX()));
                 anchor.x -= (event.getX() - dragStart.getX());
                 anchor.y -= (event.getY() - dragStart.getY());
+                anchor.x = Math.max(0, anchor.x);
+                anchor.y = Math.max(0, anchor.y);
                 dragStart.x = (int) event.getX();
                 dragStart.y = (int) event.getY();
                 drawBoard();
