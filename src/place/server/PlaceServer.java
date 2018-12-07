@@ -75,6 +75,7 @@ public class PlaceServer{
         private ObjectInputStream in;
         private ObjectOutputStream out;
         private String username = "";
+        private long lastChangeTime = 0;
 
         public ClientThread(Socket socket){
             this.socket = socket;
@@ -105,8 +106,11 @@ public class PlaceServer{
                     System.out.println("User: " + username + " connected");
                 }
             }else if(request.getType() == PlaceRequest.RequestType.CHANGE_TILE){
-                PlaceTile tile = (PlaceTile) request.getData();
-                PlaceServer.instance.updateTile(tile);
+                if(System.currentTimeMillis() - lastChangeTime >= 500) {
+                    PlaceTile tile = (PlaceTile) request.getData();
+                    PlaceServer.instance.updateTile(tile);
+                    lastChangeTime = System.currentTimeMillis();
+                }
             }
         }
 
