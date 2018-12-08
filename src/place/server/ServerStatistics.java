@@ -43,6 +43,7 @@ public class ServerStatistics {
 
         writer.write("Statistics for PlaceServer:");
         writer.newLine();
+        writer.newLine();
         writer.write("Server start time: " + new SimpleDateFormat("MM/dd/yy HH:mm:ss").format(new Date(server.startTime)));
         writer.newLine();
         writer.write("Server end time: " + new SimpleDateFormat("MM/dd/yy HH:mm:ss").format(new Date(server.endTime)));
@@ -53,9 +54,9 @@ public class ServerStatistics {
         String hr = " hours ";
         String min = " minutes ";
         String sec = " seconds ";
-        if(hours == 0) hr = " hour ";
-        if(minutes == 0) min = " minute ";
-        if(seconds == 0) sec = " second ";
+        if(hours == 1) hr = " hour ";
+        if(minutes == 1) min = " minute ";
+        if(seconds == 1) sec = " second ";
         writer.write("Server run time: " + hours + hr + minutes + min + seconds + sec);
 
 
