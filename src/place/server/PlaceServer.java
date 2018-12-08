@@ -11,22 +11,30 @@ import java.io.ObjectOutputStream;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+
 import java.util.HashMap;
+import java.util.Scanner;
 
 public class PlaceServer{
+
     public static PlaceServer instance;
     private ServerSocket server;
-    private PlaceBoard board;
+    protected PlaceBoard board;
     private volatile boolean running = true;
     private HashMap<String, ClientThread> clients;
     private InetAddress lastConnect = null;
     private long lastConnectTime = 0;
+    private ServerStatistics serverStatistics;
+    protected long startTime;
+    protected long endTime;
 
     public PlaceServer(int port, int dim){
         try {
             this.server = new ServerSocket(port);
+            this.startTime = System.currentTimeMillis();
             this.board = new PlaceBoard(dim);
             this.clients = new HashMap<>();
+            this.serverStatistics = new ServerStatistics(this);
             instance = this;
         }catch (IOException e){
             e.printStackTrace();
@@ -37,6 +45,7 @@ public class PlaceServer{
     public synchronized void updateTile(PlaceTile tile) throws IOException{
         if(board.isValid(tile)){
             board.setTile(tile);
+            serverStatistics.changeTile(tile);
             for(ClientThread client:clients.values()){
                 client.sendMessage(new PlaceRequest<>(PlaceRequest.RequestType.TILE_CHANGED, tile));
             }
@@ -48,6 +57,25 @@ public class PlaceServer{
         thread.sendMessage(new PlaceRequest<>(PlaceRequest.RequestType.BOARD, board));
     }
 
+    public void check(){
+        Scanner in = new Scanner(System.in);
+        while(running){
+            if(in.nextLine().equals("STOP")){
+                System.out.println("SERVER CLOSING");
+                running = false;
+                for(ClientThread client:clients.values()){
+                    client.closeAll();
+                }
+                try {
+                    server.close();
+                    this.endTime = System.currentTimeMillis();
+                    this.serverStatistics.generateReport();
+                    System.exit(0);
+                }
+                catch (IOException e){}
+            }
+        }
+    }
     public void runServer(){
         while (running){
             try {
@@ -65,7 +93,7 @@ public class PlaceServer{
                 lastConnectTime = System.currentTimeMillis();
                 new Thread(new ClientThread(socket)).start();
             }catch (IOException e){
-                e.printStackTrace();
+                //e.printStackTrace();
             }
         }
     }
@@ -104,6 +132,7 @@ public class PlaceServer{
                     sendMessage(new PlaceRequest(PlaceRequest.RequestType.LOGIN_SUCCESS, username));
                     PlaceServer.instance.addClient(username, this);
                     System.out.println("User: " + username + " connected");
+
                 }
             }else if(request.getType() == PlaceRequest.RequestType.CHANGE_TILE){
                 if(System.currentTimeMillis() - lastChangeTime >= 500) {
@@ -111,6 +140,8 @@ public class PlaceServer{
                     PlaceServer.instance.updateTile(tile);
                     lastChangeTime = System.currentTimeMillis();
                 }
+                PlaceTile tile = (PlaceTile) request.getData();
+                PlaceServer.instance.updateTile(tile);
             }
         }
 
@@ -157,6 +188,10 @@ public class PlaceServer{
         int dim = Integer.parseInt(args[1]);
 
         PlaceServer placeServer = new PlaceServer(port, dim);
+        Thread checking = new Thread(() -> placeServer.check());
+        checking.start();
         placeServer.runServer();
+
+
     }
 }
