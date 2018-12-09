@@ -1,7 +1,6 @@
 package place.server;
 
 import place.PlaceTile;
-
 import java.io.BufferedWriter;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -12,7 +11,9 @@ import java.util.Date;
 import java.util.HashMap;
 
 /**
- * TODO
+ * Runs along side PlaceServer
+ * Gathers data while the server is running and when the server is closed, it generates a report
+ *
  * @author Tyson Levy
  */
 public class ServerStatistics {
@@ -22,7 +23,7 @@ public class ServerStatistics {
     private HashMap<String, Integer> userChanges;
 
     /**
-     * TODO
+     * initializes ServerStatistics
      * @param server
      */
     public ServerStatistics(PlaceServer server){
@@ -39,7 +40,9 @@ public class ServerStatistics {
     }
 
     /**
-     * TODO
+     * Called whenever a tile is changed
+     * Keeps track of how many moves each user has made
+     *
      * @param tile
      */
     public void changeTile(PlaceTile tile){
@@ -51,7 +54,8 @@ public class ServerStatistics {
     }
 
     /**
-     * TODO
+     * Generates the report under the file ServerStatistics.txt
+     *
      * @throws IOException
      */
     public void generateReport() throws IOException {
