@@ -9,7 +9,8 @@ import java.io.PrintWriter;
 import java.util.*;
 
 /**
- * TODO
+ * A bot that randomly makes tile changes and send them to a PlaceServer
+ *
  * @author Tyson Levy
  */
 public class RandomBot extends ConsoleApplication implements Observer {
@@ -18,7 +19,8 @@ public class RandomBot extends ConsoleApplication implements Observer {
     private boolean firstUpdate = true;
 
     /**
-     * TODO
+     * Initializes the client by starting up the connection with a Network Client
+     * also initializes the model
      */
     public void init() {
 
@@ -30,7 +32,6 @@ public class RandomBot extends ConsoleApplication implements Observer {
         String username = args.get(2);
 
         this.model = new ClientModel();
-
 
         // Create the network connection.
         try{
@@ -44,7 +45,8 @@ public class RandomBot extends ConsoleApplication implements Observer {
     }
 
     /**
-     * TODO
+     * Starts up the BOT and keeps it running until the connection closes
+     *
      * @param userIn
      * @param userOut
      */
@@ -60,7 +62,7 @@ public class RandomBot extends ConsoleApplication implements Observer {
     }
 
     /**
-     * TODO
+     * Starts to close the client
      */
     @Override
     public void stop() {
@@ -68,7 +70,7 @@ public class RandomBot extends ConsoleApplication implements Observer {
     }
 
     /**
-     * TODO
+     * Does nothing when called because the bot has no need to "see" the board
      * @param t
      * @param o
      */
@@ -85,7 +87,7 @@ public class RandomBot extends ConsoleApplication implements Observer {
     }
 
     /**
-     * TODO
+     * Creates random tiles and send them to the NetworkClient
      */
     private void run() {
         Random random = new Random();
