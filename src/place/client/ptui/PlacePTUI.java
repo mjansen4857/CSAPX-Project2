@@ -1,7 +1,5 @@
 package place.client.ptui;
 
-import javafx.application.Application;
-import javafx.application.Platform;
 import place.*;
 import place.client.model.ClientModel;
 import place.client.network.NetworkClient;
@@ -9,7 +7,8 @@ import java.io.PrintWriter;
 import java.util.*;
 
 /**
- * TODO
+ * A PTUI client that interfaces with a running place server
+ *
  * @author Michael Jansen
  * @author Tyson Levy
  * @author Leelan Carbonell
@@ -23,7 +22,8 @@ public class PlacePTUI extends ConsoleApplication implements Observer {
     private boolean firstUpdate = true;
 
     /**
-     * TODO
+     * Initializes the client by starting up the connection with a Network Client
+     * also initializes the model
      */
     public void init() {
 
@@ -35,8 +35,6 @@ public class PlacePTUI extends ConsoleApplication implements Observer {
             String username = args.get(2);
 
             this.model = new ClientModel();
-
-
 
             // Create the network connection.
             try{
@@ -50,7 +48,8 @@ public class PlacePTUI extends ConsoleApplication implements Observer {
     }
 
     /**
-     * TODO
+     * Starts up the PTUI and keeps it running until the connection closes
+     *
      * @param userIn
      * @param userOut
      */
@@ -68,7 +67,7 @@ public class PlacePTUI extends ConsoleApplication implements Observer {
     }
 
     /**
-     * TODO
+     * Starts to close the client
      */
     @Override
     public void stop() {
@@ -77,7 +76,9 @@ public class PlacePTUI extends ConsoleApplication implements Observer {
         this.serverConn.close();
     }
 
-    /**TODO
+    /**
+     * Prints out the state of the board
+     * Called when ever a change is sent to the sever
      *
      * @param t
      * @param o
@@ -97,7 +98,7 @@ public class PlacePTUI extends ConsoleApplication implements Observer {
     }
 
     /**
-     * TODO
+     * Waits for the user to make moves and then send them to the NetworkClient
      */
     private void run() {
         Scanner in = new Scanner(System.in);
