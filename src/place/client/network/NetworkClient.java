@@ -127,10 +127,20 @@ public class NetworkClient {
         }
     }
 
+    /**
+     * TODO
+     * @return
+     */
     public String getUsername(){
         return this.username;
     }
 
+    /**
+     * TODO
+     * @param row
+     * @param col
+     * @param color
+     */
     public void sendMove(int row, int col, PlaceColor color) {
         if(System.currentTimeMillis() - lastSendTime >= 500) {
             lastSendTime = System.currentTimeMillis();

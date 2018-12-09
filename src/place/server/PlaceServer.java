@@ -21,6 +21,8 @@ import java.util.Scanner;
  * spawns a new thread to handle every client that connects
  *
  * @author Michael Jansen
+ * @author Tyson Levy
+ * @author Leelan Carbonell
  */
 public class PlaceServer{
     public static PlaceServer instance;

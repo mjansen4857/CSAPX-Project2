@@ -1,11 +1,15 @@
 package place.client.model;
 
 import place.PlaceBoard;
-import place.PlaceColor;
 import place.PlaceTile;
-
 import java.util.Observable;
 
+/**
+ * TODO
+ * @author Michael Jansen
+ * @author Tyson Levy
+ * @author Leelan Carbonell
+ */
 public class ClientModel extends Observable {
 
     private PlaceBoard board;
@@ -56,6 +60,10 @@ public class ClientModel extends Observable {
         super.notifyObservers();
     }
 
+    /**
+     * TODO
+     * @param game
+     */
     public void initBoard(PlaceBoard game){
         board = game;
         this.ready = true;
@@ -63,18 +71,37 @@ public class ClientModel extends Observable {
         super.notifyObservers();
     }
 
+    /**
+     * TODO
+     * @return
+     */
     public boolean isRunning(){
         return this.running;
     }
 
+    /**
+     * TODO
+     */
     public void close(){
         this.running = false;
     }
 
+    /**
+     * TODO
+     * @return
+     */
     public int getDim(){ return board.DIM; }
 
+    /**
+     * TODO
+     * @return
+     */
     public boolean isReady(){return ready; }
 
+    /**
+     * TODO
+     * @return
+     */
     public PlaceTile getLastTileChanged(){return lastTileChanged;}
 
     /**

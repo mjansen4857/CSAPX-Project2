@@ -8,6 +8,12 @@ import place.client.network.NetworkClient;
 import java.io.PrintWriter;
 import java.util.*;
 
+/**
+ * TODO
+ * @author Michael Jansen
+ * @author Tyson Levy
+ * @author Leelan Carbonell
+ */
 public class PlacePTUI extends ConsoleApplication implements Observer {
 
     private ClientModel model;
@@ -16,6 +22,9 @@ public class PlacePTUI extends ConsoleApplication implements Observer {
     private PrintWriter userOut;
     private boolean firstUpdate = true;
 
+    /**
+     * TODO
+     */
     public void init() {
 
             List< String > args = super.getArguments();
@@ -40,6 +49,11 @@ public class PlacePTUI extends ConsoleApplication implements Observer {
             }
     }
 
+    /**
+     * TODO
+     * @param userIn
+     * @param userOut
+     */
     @Override
     public synchronized void go(Scanner userIn, PrintWriter userOut) {
         this.userIn = userIn;
@@ -53,6 +67,9 @@ public class PlacePTUI extends ConsoleApplication implements Observer {
         }
     }
 
+    /**
+     * TODO
+     */
     @Override
     public void stop() {
         this.userIn.close();
@@ -60,6 +77,11 @@ public class PlacePTUI extends ConsoleApplication implements Observer {
         this.serverConn.close();
     }
 
+    /**TODO
+     *
+     * @param t
+     * @param o
+     */
     @Override
     public void update( Observable t, Object o ) {
 
@@ -74,6 +96,9 @@ public class PlacePTUI extends ConsoleApplication implements Observer {
         }
     }
 
+    /**
+     * TODO
+     */
     private void run() {
         Scanner in = new Scanner(System.in);
         int row;

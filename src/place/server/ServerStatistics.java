@@ -11,12 +11,20 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 
+/**
+ * TODO
+ * @author Tyson Levy
+ */
 public class ServerStatistics {
 
     private PlaceServer server;
     private ArrayList<PlaceTile>[][] tiles;
     private HashMap<String, Integer> userChanges;
 
+    /**
+     * TODO
+     * @param server
+     */
     public ServerStatistics(PlaceServer server){
         this.server = server;
         this.tiles = new ArrayList[server.board.DIM][server.board.DIM];
@@ -30,6 +38,10 @@ public class ServerStatistics {
         }
     }
 
+    /**
+     * TODO
+     * @param tile
+     */
     public void changeTile(PlaceTile tile){
 
         tiles[tile.getRow()][tile.getCol()].add(tile);
@@ -38,6 +50,10 @@ public class ServerStatistics {
 
     }
 
+    /**
+     * TODO
+     * @throws IOException
+     */
     public void generateReport() throws IOException {
         BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream("ServerStatistics.txt"), "utf-8"));
 
@@ -86,11 +102,6 @@ public class ServerStatistics {
         writer.newLine();
         writer.write("Average changes per minute: " + total / (((double)(server.endTime-server.startTime)) /((double) (1000*60))));
         writer.newLine();
-
-
-
-
-
         writer.close();
     }
 }

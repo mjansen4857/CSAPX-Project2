@@ -5,16 +5,21 @@ import place.PlaceException;
 import place.client.model.ClientModel;
 import place.client.network.NetworkClient;
 import place.client.ptui.ConsoleApplication;
-import place.client.ptui.PlacePTUI;
-
 import java.io.PrintWriter;
 import java.util.*;
 
+/**
+ * TODO
+ * @author Tyson Levy
+ */
 public class RandomBot extends ConsoleApplication implements Observer {
     private ClientModel model;
     private NetworkClient serverConn;
     private boolean firstUpdate = true;
 
+    /**
+     * TODO
+     */
     public void init() {
 
         List< String > args = super.getArguments();
@@ -38,6 +43,11 @@ public class RandomBot extends ConsoleApplication implements Observer {
         }
     }
 
+    /**
+     * TODO
+     * @param userIn
+     * @param userOut
+     */
     @Override
     public synchronized void go(Scanner userIn, PrintWriter userOut) {
 
@@ -49,17 +59,23 @@ public class RandomBot extends ConsoleApplication implements Observer {
         }
     }
 
+    /**
+     * TODO
+     */
     @Override
     public void stop() {
         this.serverConn.close();
     }
 
+    /**
+     * TODO
+     * @param t
+     * @param o
+     */
     @Override
     public void update(Observable t, Object o ) {
 
         assert t == this.model: "Update from non-model Observable";
-
-        //System.out.println(serverConn.game.toString()+"\n");
 
         if(firstUpdate){
             firstUpdate = false;
@@ -68,6 +84,9 @@ public class RandomBot extends ConsoleApplication implements Observer {
         }
     }
 
+    /**
+     * TODO
+     */
     private void run() {
         Random random = new Random();
 

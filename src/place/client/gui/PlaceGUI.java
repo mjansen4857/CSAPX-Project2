@@ -29,6 +29,8 @@ import java.util.Observer;
  * A GUI client that interfaces with a running place server
  *
  * @author Michael Jansen
+ * @author Tyson Levy
+ * @author Leelan Carbonell
  */
 public class PlaceGUI extends Application implements Observer {
     private ClientModel model;
@@ -78,6 +80,10 @@ public class PlaceGUI extends Application implements Observer {
         tp.show(mainPane, x, y);
     }
 
+    /**
+     * TODO
+     * @param mainStage
+     */
     @Override
     public synchronized void start(Stage mainStage) {
         while(!serverConn.isLoaded()) {}
@@ -185,11 +191,19 @@ public class PlaceGUI extends Application implements Observer {
         mainStage.show();
     }
 
+    /**
+     * TODO
+     */
     @Override
     public void stop(){
         serverConn.close();
     }
 
+    /**
+     * TODO
+     * @param t
+     * @param o
+     */
     @Override
     public void update(Observable t, Object o) {
         assert t == this.model: "Update from non-model Observable";
