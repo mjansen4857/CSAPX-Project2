@@ -7,11 +7,9 @@ import place.PlaceTile;
 import place.client.model.ClientModel;
 import place.network.PlaceRequest;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.PrintStream;
+import java.io.*;
 import java.net.Socket;
+import java.net.SocketException;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
 
@@ -142,7 +140,8 @@ public class NetworkClient {
                 } else {
                     this.close();
                 }
-            } catch (IOException e) {
+            }catch (SocketException e){}
+            catch (IOException e) {
                 e.printStackTrace();
             }
         }
@@ -160,6 +159,7 @@ public class NetworkClient {
             this.networkOut.close();
             this.sock.close();
         }
+        catch (SocketException e) {}
         catch( IOException ioe ) {
             // squash
             ioe.printStackTrace();
@@ -196,6 +196,9 @@ public class NetworkClient {
                 //System.out.println("\nTile Changed: " + request.getData());
                 game.setTile((PlaceTile) request.getData());
             }
+        }catch (EOFException e) {
+            close();
+            System.out.println("SERVER CLOSED");
         } catch (NoSuchElementException nse) {
             // Looks like the connection shut down.
             nse.printStackTrace();

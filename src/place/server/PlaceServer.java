@@ -12,6 +12,7 @@ import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 
+import java.net.SocketException;
 import java.util.HashMap;
 import java.util.Scanner;
 
@@ -165,8 +166,8 @@ public class PlaceServer{
                     Thread.sleep(10);
                 }
             }
+            catch (SocketException e){}
             catch (EOFException e){}
-
             catch (Exception e){
                 e.printStackTrace();
             }

@@ -107,8 +107,8 @@ public class RainbowBot extends ConsoleApplication implements Observer {
             System.exit(0);
         }
         while (serverConn.game.isRunning()){
-            for (int i=row; i<row+picture.length; i++){
-                for(int j=col; j<col+picture[0].length; j++) {
+            for (int i=row; i<row+picture.length&&serverConn.game.isRunning(); i++){
+                for(int j=col; j<col+picture[0].length&&serverConn.game.isRunning(); j++) {
                     if (model.getTile(i, j).getColor() != picture[i - row][j - col]) {
                         serverConn.sendMove(i, j, picture[i - row][j - col]);
                         try { Thread.sleep(500); } catch (InterruptedException e) { }
