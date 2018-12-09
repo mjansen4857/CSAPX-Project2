@@ -25,8 +25,12 @@ import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 
+/**
+ * A GUI client that interfaces with a running place server
+ *
+ * @author Michael Jansen
+ */
 public class PlaceGUI extends Application implements Observer {
-
     private ClientModel model;
     private NetworkClient serverConn;
     private BorderPane mainPane;
@@ -39,6 +43,7 @@ public class PlaceGUI extends Application implements Observer {
     private Point anchor = new Point(0, 0);
     private Point dragStart = new Point();
 
+    @Override
     public void init(){
         List< String > args = super.getParameters().getRaw();
 
@@ -62,6 +67,12 @@ public class PlaceGUI extends Application implements Observer {
         this.model.addObserver( this );
     }
 
+    /**
+     * Update the tile information tooltip
+     * @param text The text of the tooltip
+     * @param x X position
+     * @param y Y position
+     */
     private void updateTooltip(String text, double x, double y){
         tp.setText(text);
         tp.show(mainPane, x, y);
@@ -75,6 +86,7 @@ public class PlaceGUI extends Application implements Observer {
         tp = new Tooltip();
 
         this.canvas = new Canvas(SIZE, SIZE);
+        // Change the tile that the user clicks on
         canvas.setOnMouseClicked((event) -> {
             if(event.getButton() == MouseButton.PRIMARY){
                 double size = SIZE/model.getDim();
@@ -83,6 +95,7 @@ public class PlaceGUI extends Application implements Observer {
                 serverConn.sendMove(row, col, color);
             }
         });
+        // Scale the board when the user scrolls over it
         canvas.setOnScroll((event) -> {
             if(event.getDeltaY() < 0){
                 scale -= 0.001 * model.getDim()/20 * Math.abs(event.getDeltaY());
@@ -92,6 +105,7 @@ public class PlaceGUI extends Application implements Observer {
             scale = Math.max(1, scale);
             drawBoard();
         });
+        // Set the start position of a drag
         canvas.setOnMousePressed((event) -> {
             if(event.getButton() == MouseButton.SECONDARY){
                 dragStart.x = (int) event.getX();
@@ -99,6 +113,7 @@ public class PlaceGUI extends Application implements Observer {
                 System.out.println(dragStart);
             }
         });
+        // Drag the board around on right click
         canvas.setOnMouseDragged((event) -> {
             if(event.getButton() == MouseButton.SECONDARY){
                 anchor.x -= (event.getX() - dragStart.getX());
@@ -111,6 +126,8 @@ public class PlaceGUI extends Application implements Observer {
             }
         });
 
+        // This thread gets the location of the mouse and shows a tooltip that
+        // gives the info of the tile it is hovering over
         new Thread(() -> {
             double size = SIZE / model.getDim();
             while (serverConn.goodToGo()) {
@@ -183,6 +200,9 @@ public class PlaceGUI extends Application implements Observer {
         }
     }
 
+    /**
+     * Draw the place board on the canvas
+     */
     private void drawBoard(){
         GraphicsContext g = canvas.getGraphicsContext2D();
         g.clearRect(0, 0, SIZE, SIZE);
@@ -196,6 +216,10 @@ public class PlaceGUI extends Application implements Observer {
         }
     }
 
+    /**
+     * Redraw the area of the canvas where a tile was updated
+     * @param tile the updated tile
+     */
     private void updateCanvas(PlaceTile tile){
         GraphicsContext g = canvas.getGraphicsContext2D();
         double size = SIZE/model.getDim();
@@ -203,6 +227,11 @@ public class PlaceGUI extends Application implements Observer {
         g.fillRect(tile.getCol()*size*scale - anchor.getX(), tile.getRow()*size*scale - anchor.getY(), size*scale, size*scale);
     }
 
+    /**
+     * Convert a place tile color to a hex string
+     * @param col The color of the tile
+     * @return The hex color string
+     */
     private String hexColor(PlaceColor col){
         String red = Integer.toHexString(col.getRed());
         if (red.length() == 1) {
@@ -219,6 +248,11 @@ public class PlaceGUI extends Application implements Observer {
         return red + green + blue;
     }
 
+    /**
+     * Get a place color from the integer it represents
+     * @param i The int
+     * @return The place color
+     */
     private PlaceColor getColor(int i){
         for (PlaceColor c : PlaceColor.values()) { if (c.getNumber() == i) { return c; } }
         return null;

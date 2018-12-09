@@ -16,8 +16,13 @@ import java.net.SocketException;
 import java.util.HashMap;
 import java.util.Scanner;
 
+/**
+ * Implementation of a Place Server. This is a multi-threaded server that
+ * spawns a new thread to handle every client that connects
+ *
+ * @author Michael Jansen
+ */
 public class PlaceServer{
-
     public static PlaceServer instance;
     private ServerSocket server;
     protected PlaceBoard board;
@@ -29,6 +34,12 @@ public class PlaceServer{
     protected long startTime;
     protected long endTime;
 
+    /**
+     * Constructs a place server. Starts running a server socket
+     * and prepares everything
+     * @param port The port to run the server on
+     * @param dim The dimension of the place board
+     */
     public PlaceServer(int port, int dim){
         try {
             this.server = new ServerSocket(port);
@@ -43,21 +54,38 @@ public class PlaceServer{
         }
     }
 
+    /**
+     * Updates a tile on the place board and then sends that update to all connected clients
+     * @param tile The tile that should be updated
+     * @throws IOException
+     */
     public synchronized void updateTile(PlaceTile tile) throws IOException{
-        if(board.isValid(tile)){
-            board.setTile(tile);
-            serverStatistics.changeTile(tile);
-            for(ClientThread client:clients.values()){
-                client.sendMessage(new PlaceRequest<>(PlaceRequest.RequestType.TILE_CHANGED, tile));
+        synchronized (board) {
+            if (board.isValid(tile)) {
+                board.setTile(tile);
+                serverStatistics.changeTile(tile);
+                for (ClientThread client : clients.values()) {
+                    client.sendMessage(new PlaceRequest<>(PlaceRequest.RequestType.TILE_CHANGED, tile));
+                }
             }
         }
     }
 
+    /**
+     * Adds a client to the list of connected clients and sends them the current state of
+     * the board
+     * @param username The username of the client
+     * @param thread The thread that the client is running on
+     * @throws IOException
+     */
     public void addClient(String username, ClientThread thread) throws IOException{
         clients.put(username, thread);
         thread.sendMessage(new PlaceRequest<>(PlaceRequest.RequestType.BOARD, board));
     }
 
+    /**
+     * Stop the server cleanly if the user types STOP
+     */
     public void check(){
         Scanner in = new Scanner(System.in);
         while(running){
@@ -73,10 +101,17 @@ public class PlaceServer{
                     this.serverStatistics.generateReport();
                     System.exit(0);
                 }
-                catch (IOException e){}
+                catch (IOException e){
+                    e.printStackTrace();
+                }
             }
         }
     }
+
+    /**
+     * The main loop of the server. This loop waits for a connection to the server then spawns
+     * a thread to handle that client
+     */
     public void runServer(){
         while (running){
             try {
@@ -99,6 +134,9 @@ public class PlaceServer{
         }
     }
 
+    /**
+     * This subclass is a thread used to handle communication with a client
+     */
     private class ClientThread implements Runnable{
         private Socket socket;
         private ObjectInputStream in;
@@ -106,6 +144,10 @@ public class PlaceServer{
         private String username = "";
         private long lastChangeTime = 0;
 
+        /**
+         * Construct the client thread
+         * @param socket The socket representing the connection to a client
+         */
         public ClientThread(Socket socket){
             this.socket = socket;
             try {
@@ -118,19 +160,29 @@ public class PlaceServer{
             }
         }
 
+        /**
+         * Send a message to the client
+         * @param request The request to send
+         * @throws IOException
+         */
         public void sendMessage(PlaceRequest request) throws IOException{
             out.writeUnshared(request);
             out.flush();
         }
 
+        /**
+         * Handle a message received from the client
+         * @param request The request from the client
+         * @throws IOException
+         */
         public void handleMessage(PlaceRequest request) throws IOException{
             if(request.getType() == PlaceRequest.RequestType.LOGIN){
                 this.username = (String) request.getData();
                 if(clients.containsKey(username)){
                     System.out.println("Username already exists: " + username);
-                    sendMessage(new PlaceRequest(PlaceRequest.RequestType.ERROR, "Username already taken!"));
+                    sendMessage(new PlaceRequest<>(PlaceRequest.RequestType.ERROR, "Username already taken!"));
                 }else{
-                    sendMessage(new PlaceRequest(PlaceRequest.RequestType.LOGIN_SUCCESS, username));
+                    sendMessage(new PlaceRequest<>(PlaceRequest.RequestType.LOGIN_SUCCESS, username));
                     PlaceServer.instance.addClient(username, this);
                     System.out.println("User: " + username + " connected");
 
@@ -141,12 +193,12 @@ public class PlaceServer{
                     PlaceServer.instance.updateTile(tile);
                     lastChangeTime = System.currentTimeMillis();
                 }
-                else{handleMessage(request);}
-                //PlaceTile tile = (PlaceTile) request.getData();
-                //PlaceServer.instance.updateTile(tile);
             }
         }
 
+        /**
+         * Close the socket and input/output streams
+         */
         public void closeAll(){
             try {
                 if(socket != null) socket.close();
@@ -193,7 +245,5 @@ public class PlaceServer{
         Thread checking = new Thread(() -> placeServer.check());
         checking.start();
         placeServer.runServer();
-
-
     }
 }
