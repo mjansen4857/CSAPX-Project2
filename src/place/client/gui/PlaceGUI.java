@@ -45,6 +45,10 @@ public class PlaceGUI extends Application implements Observer {
     private Point anchor = new Point(0, 0);
     private Point dragStart = new Point();
 
+    /**
+     * Initializes the client by starting up the connection with a Network Client
+     * also initializes the model
+     */
     @Override
     public void init(){
         List< String > args = super.getParameters().getRaw();
@@ -81,7 +85,8 @@ public class PlaceGUI extends Application implements Observer {
     }
 
     /**
-     * TODO
+     * Creates the GUI and sets everything up
+     *
      * @param mainStage
      */
     @Override
@@ -166,6 +171,7 @@ public class PlaceGUI extends Application implements Observer {
         }).start();
         drawBoard();
 
+        //Buttons on the bottom for choosing the color
         HBox bottom = new HBox();
         for (int i = 0; i < 16; i++) {
 
@@ -192,7 +198,7 @@ public class PlaceGUI extends Application implements Observer {
     }
 
     /**
-     * TODO
+     * Starts to shut down the Client
      */
     @Override
     public void stop(){
@@ -200,7 +206,9 @@ public class PlaceGUI extends Application implements Observer {
     }
 
     /**
-     * TODO
+     * Updates the GUI
+     * Called when any change is sent to the server
+     *
      * @param t
      * @param o
      */
