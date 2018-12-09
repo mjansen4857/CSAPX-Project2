@@ -141,8 +141,9 @@ public class PlaceServer{
                     PlaceServer.instance.updateTile(tile);
                     lastChangeTime = System.currentTimeMillis();
                 }
-                PlaceTile tile = (PlaceTile) request.getData();
-                PlaceServer.instance.updateTile(tile);
+                else{handleMessage(request);}
+                //PlaceTile tile = (PlaceTile) request.getData();
+                //PlaceServer.instance.updateTile(tile);
             }
         }
 

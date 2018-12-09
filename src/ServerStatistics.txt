@@ -1,5 +1,8 @@
 Statistics for PlaceServer:
 
-Server start time: 12/08/18 21:36:57
-Server end time: 12/08/18 21:37:04
-Server run time: 0 hours 0 minutes 7 seconds 
+Server start time: 12/08/18 22:09:27
+Server end time: 12/08/18 22:09:29
+Server run time: 0 hours 0 minutes 2 seconds 
+
+Users with the most changes (0 changes): 
+Average changes per minute: 0.0

@@ -44,6 +44,7 @@ public class ServerStatistics {
         writer.write("Statistics for PlaceServer:");
         writer.newLine();
         writer.newLine();
+
         writer.write("Server start time: " + new SimpleDateFormat("MM/dd/yy HH:mm:ss").format(new Date(server.startTime)));
         writer.newLine();
         writer.write("Server end time: " + new SimpleDateFormat("MM/dd/yy HH:mm:ss").format(new Date(server.endTime)));
@@ -58,6 +59,26 @@ public class ServerStatistics {
         if(minutes == 1) min = " minute ";
         if(seconds == 1) sec = " second ";
         writer.write("Server run time: " + hours + hr + minutes + min + seconds + sec);
+        writer.newLine();
+        writer.newLine();
+
+        int max = 0;
+        int total = 0;
+        String mostChanges = "";
+        if(userChanges.size() != 0){
+            max = userChanges.get(userChanges.keySet().toArray()[0]);
+            for(String user : userChanges.keySet()){
+                total += userChanges.get(user);
+                if (userChanges.get(user) > max) { max = userChanges.get(user);}
+            }
+            for(String user : userChanges.keySet()){
+                if(userChanges.get(user) == max){ mostChanges += user + " "; }
+            }
+        }
+        writer.write("Users with the most changes (" + max + " changes): " + mostChanges);
+        writer.newLine();
+        writer.write("Average changes per minute: " + total / (((double)(server.endTime-server.startTime)) /((double) (1000*60))));
+        writer.newLine();
 
 
 
