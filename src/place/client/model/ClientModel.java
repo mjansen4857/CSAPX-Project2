@@ -5,7 +5,8 @@ import place.PlaceTile;
 import java.util.Observable;
 
 /**
- * TODO
+ * A model for the clients to connect to so whenever a change is made to the model the client is notified
+ *
  * @author Michael Jansen
  * @author Tyson Levy
  * @author Leelan Carbonell
@@ -61,7 +62,8 @@ public class ClientModel extends Observable {
     }
 
     /**
-     * TODO
+     * initializes the models board to be equal to game
+     *
      * @param game
      */
     public void initBoard(PlaceBoard game){
@@ -72,35 +74,26 @@ public class ClientModel extends Observable {
     }
 
     /**
-     * TODO
-     * @return
+     * Returns if the server is running
      */
     public boolean isRunning(){
         return this.running;
     }
 
     /**
-     * TODO
+     * Sets running to false
      */
     public void close(){
         this.running = false;
     }
 
     /**
-     * TODO
-     * @return
+     * returns the dimensions of the board
      */
     public int getDim(){ return board.DIM; }
 
     /**
-     * TODO
-     * @return
-     */
-    public boolean isReady(){return ready; }
-
-    /**
-     * TODO
-     * @return
+     * returns the last tile changed
      */
     public PlaceTile getLastTileChanged(){return lastTileChanged;}
 
