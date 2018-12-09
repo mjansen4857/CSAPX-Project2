@@ -128,15 +128,14 @@ public class NetworkClient {
     }
 
     /**
-     * TODO
-     * @return
+     * returns the username for the client
      */
     public String getUsername(){
         return this.username;
     }
 
     /**
-     * TODO
+     * Sends a move to the server if its been over 500 milliseconds since the last change
      * @param row
      * @param col
      * @param color
