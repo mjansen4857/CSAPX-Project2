@@ -71,6 +71,7 @@ public class RandomBot extends ConsoleApplication implements Observer {
 
     /**
      * Does nothing when called because the bot has no need to "see" the board
+     *
      * @param t
      * @param o
      */

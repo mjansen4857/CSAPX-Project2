@@ -9,7 +9,8 @@ import java.io.PrintWriter;
 import java.util.*;
 
 /**
- * TODO
+ * Draws a Creeper face where ever on the board you like
+ *
  * @author Tyson Levy
  */
 public class CreeperBot extends ConsoleApplication implements Observer {
@@ -20,7 +21,9 @@ public class CreeperBot extends ConsoleApplication implements Observer {
     private PlaceColor[][] picture;
 
     /**
-     * TODO
+     * Initializes the client by starting up the connection with a Network Client
+     * also initializes the model
+     * also creates the picture
      */
     public void init() {
 
@@ -62,7 +65,6 @@ public class CreeperBot extends ConsoleApplication implements Observer {
 
         this.model = new ClientModel();
 
-
         // Create the network connection.
         try{
             this.serverConn = new NetworkClient(host, port, username, this.model);
@@ -75,7 +77,8 @@ public class CreeperBot extends ConsoleApplication implements Observer {
     }
 
     /**
-     * TODO
+     * Starts up the BOT and keeps it running until the connection closes
+     *
      * @param userIn
      * @param userOut
      */
@@ -91,7 +94,7 @@ public class CreeperBot extends ConsoleApplication implements Observer {
     }
 
     /**
-     * TODO
+     * Starts to close the client
      */
     @Override
     public void stop() {
@@ -99,7 +102,8 @@ public class CreeperBot extends ConsoleApplication implements Observer {
     }
 
     /**
-     * TODO
+     * Does nothing when called because the bot has no need to "see" the board
+     *
      * @param t
      * @param o
      */
@@ -116,7 +120,10 @@ public class CreeperBot extends ConsoleApplication implements Observer {
     }
 
     /**
-     * TODO
+     * Asks for a location to draw the picture
+     * if an invalid space is given it defaults to the top left
+     * if the picture is bigger than the board, the bot closes
+     * Draws the picture at the given location and then protects the spaces if a change is made
      */
     private void run() {
         Scanner in = new Scanner(System.in);
