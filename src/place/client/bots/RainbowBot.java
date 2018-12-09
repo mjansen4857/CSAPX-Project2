@@ -5,12 +5,12 @@ import place.PlaceException;
 import place.client.model.ClientModel;
 import place.client.network.NetworkClient;
 import place.client.ptui.ConsoleApplication;
-
 import java.io.PrintWriter;
 import java.util.*;
 
 /**
- * TODO
+ * Draws a rainbow across the top of the board
+ *
  * @author Tyson Levy
  */
 public class RainbowBot extends ConsoleApplication implements Observer {
@@ -21,7 +21,8 @@ public class RainbowBot extends ConsoleApplication implements Observer {
     private PlaceColor[][] picture;
 
     /**
-     * TODO
+     * Initializes the client by starting up the connection with a Network Client
+     * also initializes the model
      */
     public void init() {
 
@@ -35,7 +36,6 @@ public class RainbowBot extends ConsoleApplication implements Observer {
 
         this.model = new ClientModel();
 
-
         // Create the network connection.
         try{
             this.serverConn = new NetworkClient(host, port, username, this.model);
@@ -48,7 +48,8 @@ public class RainbowBot extends ConsoleApplication implements Observer {
     }
 
     /**
-     * TODO
+     * Starts up the BOT and keeps it running until the connection closes
+     *
      * @param userIn
      * @param userOut
      */
@@ -64,7 +65,7 @@ public class RainbowBot extends ConsoleApplication implements Observer {
     }
 
     /**
-     * TODO
+     * Starts to close the client
      */
     @Override
     public void stop() {
@@ -72,7 +73,8 @@ public class RainbowBot extends ConsoleApplication implements Observer {
     }
 
     /**
-     * TODO
+     * Does nothing when called because the bot has no need to "see" the board
+     *
      * @param t
      * @param o
      */
@@ -89,7 +91,7 @@ public class RainbowBot extends ConsoleApplication implements Observer {
     }
 
     /**
-     * TODO
+     * Draws the rainbow across the top of the board and protects the spaces
      */
     private void run() {
 
