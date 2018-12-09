@@ -53,29 +53,36 @@ public class ServerStatistics {
         int minutes = (int) (((server.endTime-server.startTime) / (1000*60)) % 60);
         int hours   = (int) (((server.endTime-server.startTime) / (1000*60*60)) % 24);
         String hr = " hours ";
-        String min = " minutes ";
+        String mins = " minutes ";
         String sec = " seconds ";
         if(hours == 1) hr = " hour ";
-        if(minutes == 1) min = " minute ";
+        if(minutes == 1) mins = " minute ";
         if(seconds == 1) sec = " second ";
-        writer.write("Server run time: " + hours + hr + minutes + min + seconds + sec);
+        writer.write("Server run time: " + hours + hr + minutes + mins + seconds + sec);
         writer.newLine();
         writer.newLine();
 
         int max = 0;
+        int min = 0;
         int total = 0;
         String mostChanges = "";
+        String leastChanges = "";
         if(userChanges.size() != 0){
             max = userChanges.get(userChanges.keySet().toArray()[0]);
+            min = userChanges.get(userChanges.keySet().toArray()[0]);
             for(String user : userChanges.keySet()){
                 total += userChanges.get(user);
-                if (userChanges.get(user) > max) { max = userChanges.get(user);}
+                if (userChanges.get(user) > max) { max = userChanges.get(user); }
+                if (userChanges.get(user) < min) { min = userChanges.get(user); }
             }
             for(String user : userChanges.keySet()){
                 if(userChanges.get(user) == max){ mostChanges += user + " "; }
+                if(userChanges.get(user) == min){ leastChanges += user + " "; }
             }
         }
         writer.write("Users with the most changes (" + max + " changes): " + mostChanges);
+        writer.newLine();
+        writer.write("Users with the least changes (" + min + " changes): " + leastChanges);
         writer.newLine();
         writer.write("Average changes per minute: " + total / (((double)(server.endTime-server.startTime)) /((double) (1000*60))));
         writer.newLine();
