@@ -243,6 +243,9 @@ public class PlaceGUI extends Application implements Observer {
      * @param tile the updated tile
      */
     private void updateCanvas(PlaceTile tile){
+        try {
+            Thread.sleep(50);
+        } catch (InterruptedException e) { }
         GraphicsContext g = canvas.getGraphicsContext2D();
         double size = SIZE/model.getDim();
         g.setFill(Color.valueOf(hexColor(tile.getColor())));

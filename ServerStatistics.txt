@@ -1,9 +1,9 @@
 Statistics for PlaceServer:
 
-Server start time: 12/09/18 19:13:07
-Server end time: 12/09/18 19:17:46
-Server run time: 0 hours 4 minutes 38 seconds 
+Server start time: 12/09/18 19:50:31
+Server end time: 12/09/18 19:54:52
+Server run time: 0 hours 4 minutes 21 seconds 
 
-Users with the most changes (101 changes): rainbow 
-Users with the least changes (1 changes): Tyson2 
-Average changes per minute: 45.1693851944793
+Users with the most changes (494 changes): bot2 
+Users with the least changes (30 changes): me 
+Average changes per minute: 246.30277779905185
