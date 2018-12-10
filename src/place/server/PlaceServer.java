@@ -215,7 +215,14 @@ public class PlaceServer{
             try{
                 while (socket.isConnected() && running){
                     PlaceRequest<?> request = (PlaceRequest<?>) in.readUnshared();
-                    handleMessage(request);
+                    Thread handle = new Thread(() -> {
+                        try {
+                            handleMessage(request);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    });
+                    handle.start();
                     Thread.sleep(10);
                 }
             }
