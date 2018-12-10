@@ -205,7 +205,8 @@ public class NetworkClient {
                 //System.out.println("\nTile Changed: " + request.getData());
                 game.setTile((PlaceTile) request.getData());
             }
-        }catch (EOFException e) {
+        }catch (SocketException e) {}
+        catch (EOFException e) {
             close();
             System.out.println("SERVER CLOSED");
         } catch (NoSuchElementException nse) {
